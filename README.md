@@ -4,7 +4,7 @@ Fine-tuning of [facebook/nllb-200-distilled-600M](https://huggingface.co/faceboo
 
 Qom (also known as Toba) is an endangered Guaycurú language spoken by ~80,000 people in Argentina's Chaco province. It has no prior representation in NLP datasets or major MT systems. There is no native NLLB language code for Qom; we use `grn_Latn` (Guaraní) as a proxy tag.
 
-Part of a project to build the first Qom–Spanish parallel corpus and neural MT system, affiliated with [Universidad de Buenos Aires](https://www.uba.ar/). Targeting publication at [AmericasNLP 2026](https://americasnlp.github.io/).
+Part of a project to build the first Qom–Spanish parallel corpus and neural MT system, affiliated with [Universidad de Buenos Aires](https://www.uba.ar/). Targeting publication at [AmericasNLP 2026](https://github.com/AmericasNLP).
 
 ---
 
