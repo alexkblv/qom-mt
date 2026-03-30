@@ -1,3 +1,6 @@
 corpus/
 *.safetensors
 *.bin
+qom-nllb-strat/
+qom-nllb-nonstrat/
+.DS_Store
