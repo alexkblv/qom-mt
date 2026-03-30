@@ -8,6 +8,17 @@ Part of a project to build the first Qom–Spanish parallel corpus and neural MT
 
 ---
 
+## Models on Hugging Face
+
+| Model | Split | Direction |
+|---|---|---|
+| [alexkblv/qom-nllb-strat-es2qom](https://huggingface.co/alexkblv/qom-nllb-strat-es2qom) | Stratified | ES → QOM |
+| [alexkblv/qom-nllb-strat-qom2es](https://huggingface.co/alexkblv/qom-nllb-strat-qom2es) | Stratified | QOM → ES |
+| [alexkblv/qom-nllb-nostrat-es2qom](https://huggingface.co/alexkblv/qom-nllb-nostrat-es2qom) | Random | ES → QOM |
+| [alexkblv/qom-nllb-nostrat-qom2es](https://huggingface.co/alexkblv/qom-nllb-nostrat-qom2es) | Random | QOM → ES |
+
+---
+
 ## Notebooks
 
 | Notebook | Split strategy |
@@ -70,5 +81,3 @@ Notebooks run on Kaggle (T4×2 GPU; single GPU enforced via `CUDA_VISIBLE_DEVICE
 - Optimizer: Adafactor
 - Epochs: 10 · Effective batch size: 16
 - Saved in fp16
-
-Model weights are not included in this repository.
