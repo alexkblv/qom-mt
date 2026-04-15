@@ -1,83 +1,154 @@
-# Qom–Spanish MT Baseline (NLLB-600M)
+# Qom–Spanish Neural Machine Translation
 
-Fine-tuning of [facebook/nllb-200-distilled-600M](https://huggingface.co/facebook/nllb-200-distilled-600M) on a Qom (Toba)–Spanish parallel corpus. Both translation directions are trained and evaluated.
+First parallel corpus and neural MT baseline for **Qom (Toba, ISO: `tob`)**, an endangered Guaycurú language spoken by ~80,000 people in the Argentine Chaco. Qom is absent from all major multilingual NLP benchmarks (AmericasNLP editions, OPUS-100, NLLB-200).
 
-Qom (also known as Toba) is an endangered Guaycurú language spoken by ~80,000 people in Argentina's Chaco province. It has no prior representation in NLP datasets or major MT systems. There is no native NLLB language code for Qom; we use `grn_Latn` (Guaraní) as a proxy tag.
-
-Part of a project to build the first Qom–Spanish parallel corpus and neural MT system, affiliated with [Universidad de Buenos Aires](https://www.uba.ar/). Targeting publication at [AmericasNLP 2026](https://github.com/AmericasNLP).
+This work is being submitted to **AmericasNLP 2026** and is affiliated with the Universidad de Buenos Aires (UBA).
 
 ---
 
-## Models on Hugging Face
+## Repository structure
 
-| Model | Split | Direction |
-|---|---|---|
-| [alexkblv/qom-nllb-strat-es2qom](https://huggingface.co/alexkblv/qom-nllb-strat-es2qom) | Stratified | ES → QOM |
-| [alexkblv/qom-nllb-strat-qom2es](https://huggingface.co/alexkblv/qom-nllb-strat-qom2es) | Stratified | QOM → ES |
-| [alexkblv/qom-nllb-nostrat-es2qom](https://huggingface.co/alexkblv/qom-nllb-nostrat-es2qom) | Random | ES → QOM |
-| [alexkblv/qom-nllb-nostrat-qom2es](https://huggingface.co/alexkblv/qom-nllb-nostrat-qom2es) | Random | QOM → ES |
-
----
-
-## Notebooks
-
-| Notebook | Split strategy |
-|---|---|
-| `qom-mt-nostrat.ipynb` | Random (non-stratified) split |
-| `qom-mt-strat.ipynb` | Stratified split by source document |
-
----
-
-## Results
-
-### Random split (`qom-mt-nostrat.ipynb`)
-
-Train: 1933 · Dev: 142 · Test: 257
-
-| Direction | BLEU | ChrF | ChrF++ | ChrF2 | ChrF2++ |
-|---|---|---|---|---|---|
-| ES → QOM | 9.19 | 38.43 | 35.13 | 36.62 | 33.48 |
-| QOM → ES | 8.42 | 29.88 | 27.98 | 28.53 | 26.68 |
-
-### Stratified split (`qom-mt-strat.ipynb`)
-
-Train: 1832 · Dev: 192 · Test: 308
-
-| Direction | BLEU | ChrF | ChrF++ | ChrF2 | ChrF2++ |
-|---|---|---|---|---|---|
-| ES → QOM | 6.93 | 37.48 | 34.24 | 35.69 | 32.61 |
-| QOM → ES | 8.26 | 31.11 | 29.29 | 28.87 | 27.31 |
-
-The stratified split is the more rigorous evaluation. Random splits inflate scores because the test set ends up dominated by Arte verbal qom (the largest source document), which overlaps heavily with the training distribution. The stratified split enforces proportional representation of all four source documents across train/dev/test.
+```
+qom/
+├── corpus/                         # Raw and processed corpus files
+├── corpus-statistics.ipynb         # Corpus statistics and analysis
+├── qom-mt-ablation-inference.ipynb # Inference and ablation experiments
+├── qom-mt-bible-es2qom.ipynb       # Bible-only baseline: ES → QOM
+├── qom-mt-bible-qom2es.ipynb       # Bible-only baseline: QOM → ES
+├── qom-mt-translations-eval.ipynb  # Translation evaluation
+├── qom-mt-translations.ipynb       # Translation generation
+├── qom-mt-v1-nostrat.ipynb         # V1 corpus, non-stratified split
+├── qom-mt-v1-strat.ipynb           # V1 corpus, stratified split
+├── qom-mt-v2-nostrat-es2qom.ipynb  # V2 corpus, non-stratified, ES → QOM
+├── qom-mt-v2-nostrat-qom2es.ipynb  # V2 corpus, non-stratified, QOM → ES
+├── qom-mt-v2-strat-es2qom.ipynb    # V2 corpus, stratified, ES → QOM
+├── qom-mt-v2-strat-qom2es.ipynb    # V2 corpus, stratified, QOM → ES
+├── qom-nllb-nonstrat/              # Saved model: non-stratified split
+├── qom-nllb-strat/                 # Saved model: stratified split
+└── README.md
+```
 
 ---
 
 ## Corpus
 
-The parallel corpus (~2,300 sentence pairs after deduplication) is drawn from four source documents:
+### V1 (~2,277 pairs)
+Four source documents, manually parallelized:
 
-- Arte verbal qom
-- Educación Sanitaria Intercultural
-- Materiales del Taller de Lengua y Cultura Toba
-- Las Aventuras de Copaic
+| Source | Pairs |
+|---|---|
+| Arte verbal qom | 1,829 |
+| Materiales del Taller de Lengua y Cultura Toba | 267 |
+| Las Aventuras de Copaic | 17 |
+| Educación Sanitaria Intercultural | 169 |
+| La Declaración Universal de los Derechos Humanos | 61 |
 
-The corpus is not included in this repository (private data).
+### V2 (~33,331 pairs)
+V1 plus two large-scale additions aligned by the project team:
 
----
+- **La Biblia** (`La Biblia.csv`): Qom version La'aqtaga Ñim Lo'onatac 'Enauacna 2013 (`LÑLE13`) aligned with Spanish version DHHS94. Bible pairs constitute ~91% of V2 training data.
+- **El Principito** (`El Principito.csv`): Qom translation aligned with the Spanish original.
 
-## Setup
+> **Note on V2 metrics:** La Biblia dominates both the training set and the test set (~89–94% of test pairs under random splits). This inflates V2 evaluation scores relative to V1. A Bible-only baseline experiment is included to quantify this effect. All V2 performance claims should be interpreted in light of data composition.
 
-Notebooks run on Kaggle (T4×2 GPU; single GPU enforced via `CUDA_VISIBLE_DEVICES=0`).
+### Data schema
+All corpus sources are normalized to two columns: `qom` and `linea_es` (or equivalent). Source-specific column names:
+- xlsx sources: `linea_qom` / `linea_es`
+- `El Principito.csv`: `qom` / `espanol`
+- `La Biblia.csv`: `LÑLE13` / `DHHS94`
 
-**Requirements:** The notebooks install their own dependencies (`sacrebleu`, `evaluate`, `openpyxl`, `transformers`).
-
-**Input:** A Kaggle dataset with the parallel corpus as `.xlsx` files, each containing `linea_qom` and `linea_es` columns.
+### Data loading
+Sources are loaded via the `read_csv_source()` helper with a `DATA_DIR` path variable and normalized to a canonical `qom` / `es` schema before training.
 
 ---
 
 ## Model
 
-- Base model: `facebook/nllb-200-distilled-600M`
-- Optimizer: Adafactor
-- Epochs: 10 · Effective batch size: 16
-- Saved in fp16
+**Base model:** `facebook/nllb-200-distilled-600M`  
+**Proxy language tag:** `grn_Latn` (Guaraní) — chosen for typological similarity (agglutinative morphology, Guaraní–Spanish is the closest publicly available parallel corpus at ~30K pairs).  
+**Optimizer:** Adafactor  
+**Epochs:** 10  
+**Effective batch size:** 16  
+**Learning rate:** 5e-4  
+**Precision:** FP16  
+**Compute:** Kaggle (T4×2, restricted to single GPU via `CUDA_VISIBLE_DEVICES=0`)
+
+---
+
+## Experiments
+
+Four experimental conditions, each with its own notebook:
+
+| Condition | Split | Direction | Notebook |
+|---|---|---|---|
+| V2 stratified | Stratified by source doc | ES → QOM | `qom-mt-v2-strat-es2qom.ipynb` |
+| V2 stratified | Stratified by source doc | QOM → ES | `qom-mt-v2-strat-qom2es.ipynb` |
+| V2 non-stratified | Random | ES → QOM | `qom-mt-v2-nostrat-es2qom.ipynb` |
+| V2 non-stratified | Random | QOM → ES | `qom-mt-v2-nostrat-qom2es.ipynb` |
+| Bible-only baseline | Stratified | ES → QOM | `qom-mt-bible-es2qom.ipynb` |
+| Bible-only baseline | Stratified | QOM → ES | `qom-mt-bible-qom2es.ipynb` |
+| V1 stratified | Stratified by source doc | Both | `qom-mt-v1-strat.ipynb` |
+| V1 non-stratified | Random | Both | `qom-mt-v1-nostrat.ipynb` |
+
+**Stratified vs. random splits:** Stratified splits assign entire source documents proportionally across train/dev/test, preventing data leakage at the fragment level. They produce lower but more representative scores. Random splits are dominated by La Biblia and inflate metrics.
+
+---
+
+## Results
+
+### V1 baseline
+
+| Direction | BLEU | ChrF | ChrF++ | ChrF2 | ChrF2++ |
+|---|---|---|---|---|---|
+| ES → QOM | 0.0 | 7.70 | 6.16 | 5.12 | 4.10 |
+| QOM → ES | 0.0 | 4.03 | 3.22 | 2.70 | 2.16 |
+
+### V2 (random split)
+
+| Direction | ChrF2++ |
+|---|---|
+| ES → QOM | 52.21 |
+| QOM → ES | — (run cut off by Kaggle time limit) |
+
+Primary metric: **ChrF2++** (aligned with AmericasNLP competition scoring).
+
+---
+
+## Models on Hugging Face
+
+| Model | Hub ID |
+|---|---|
+| V2 stratified ES→QOM | `alexkblv/qom-nllb-strat-es2qom` |
+| V2 stratified QOM→ES | `alexkblv/qom-nllb-strat-qom2es` |
+| V2 non-stratified ES→QOM | `alexkblv/qom-nllb-nostrat-es2qom` |
+| V2 non-stratified QOM→ES | `alexkblv/qom-nllb-nostrat-qom2es` |
+
+---
+
+## Known issues and caveats
+
+- **Kaggle environment:** Use `eval_strategy` (not `evaluation_strategy`) and `processing_class` (not `tokenizer`) — transformers 4.46 breaking changes. Always set `CUDA_VISIBLE_DEVICES=0` to avoid DataParallel OOM. Clear checkpoints before saving the final model to avoid disk-full errors.
+- **Session time limit:** Kaggle enforces a 12-hour session limit. Long QOM→ES runs may be cut off and must be resumed from the last checkpoint.
+- **Bible copyright:** The copyright status of La Biblia for training use is unresolved. Results relying on Bible data should be interpreted accordingly.
+- **BLEU = 0 in V1:** BLEU was not computed due to computational constraints; ChrF-family metrics are preferred for morphologically rich low-resource languages in any case.
+
+---
+
+## Citation
+
+If you use this corpus or models, please cite:
+
+```bibtex
+@inproceedings{korablev2026qom,
+  title     = {A Parallel Corpus and Neural {MT} Baseline for {Qom} ({Toba})},
+  author    = {Korablev, Aleksei and Cotik, Viviana},
+  booktitle = {Proceedings of AmericasNLP 2026},
+  year      = {2026}
+}
+```
+
+---
+
+## Acknowledgments
+
+This project is affiliated with the Universidad de Buenos Aires (UBA). Corpus construction involved collaboration with linguists Paola Cúneo and Temis Tacconi. Parallelization of La Biblia and El Principito was led by Pablo (UBA).
