@@ -1,6 +1,30 @@
-corpus/
+# Raw corpora, at the repo root only: artifacts/corpus/ holds tracked manifests.
+/corpus/
+/corpus-speech/
 *.safetensors
 *.bin
 qom-nllb-strat/
 qom-nllb-nonstrat/
 .DS_Store
+
+# Internal working documents — kept locally, not published. Anything under
+# private/ is ignored; the Office patterns catch stray copies elsewhere.
+private/
+*.docx
+*.xlsx
+
+# Generated artifacts: manifests are versioned (hashes, counts, check results),
+# but the tables themselves carry corpus text, which is not ours to redistribute.
+artifacts/**/*.csv
+artifacts/models/
+
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.venv/
+dist/
+build/
+
+# Secrets, e.g. the translator's Hugging Face token
+.env

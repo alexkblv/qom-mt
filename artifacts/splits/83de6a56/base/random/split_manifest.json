@@ -1,0 +1,144 @@
+{
+  "schema_version": "2.0.0",
+  "package_version": "2.1.0",
+  "code_fingerprint": "sha256:e9f2654ca297f04ad46210af5d8bc31b522c9f58b9dc552b747cee2b8d272d00",
+  "built_utc": "2026-09-23T13:05:45+00:00",
+  "split_id": "base/random",
+  "purpose": "headline",
+  "config": "base",
+  "strategy": "random",
+  "bible_grouping": "chapter",
+  "corpus_sha256": "83de6a5612693312fd0c2309bba64cfd3d06a99d5598b1cd15d4af737a5042f9",
+  "corpus": "text-v1",
+  "corpus_sha8": "83de6a56",
+  "seed": 42,
+  "target_fractions": {
+    "train": 0.8,
+    "dev": 0.1,
+    "test": 0.1
+  },
+  "forced_partitions": {
+    "Las Aventuras de Copaic": "test"
+  },
+  "realized": {
+    "train": {
+      "rows": 2282,
+      "groups": 96,
+      "fraction": 0.7957
+    },
+    "dev": {
+      "rows": 285,
+      "groups": 49,
+      "fraction": 0.0994
+    },
+    "test": {
+      "rows": 301,
+      "groups": 50,
+      "fraction": 0.105
+    }
+  },
+  "per_source_rows": {
+    "train": {
+      "Arte verbal qom": 1550,
+      "El Principito": 440,
+      "Materiales del Taller de Lengua y Cultura Toba": 173,
+      "Educación Sanitaria Intercultural": 103,
+      "La Declaración Universal de los Derechos Humanos": 16
+    },
+    "dev": {
+      "Arte verbal qom": 89,
+      "El Principito": 63,
+      "Materiales del Taller de Lengua y Cultura Toba": 60,
+      "Educación Sanitaria Intercultural": 50,
+      "La Declaración Universal de los Derechos Humanos": 23
+    },
+    "test": {
+      "Arte verbal qom": 131,
+      "Educación Sanitaria Intercultural": 58,
+      "El Principito": 47,
+      "Materiales del Taller de Lengua y Cultura Toba": 30,
+      "La Declaración Universal de los Derechos Humanos": 19,
+      "Las Aventuras de Copaic": 16
+    }
+  },
+  "partition_sha256": {
+    "train": "aa329e228789a00e54daf45cfc2d199381c82c69baa73a907bdc4a49240f0bf8",
+    "dev": "82f62c45e4eff63f4a1f9a8400806c4762f8be8a0ea51184ef629f74aa27fefc",
+    "test": "1f4c776ed94fc4873860945aea9cc663bdde0c213f179d0ef308a3f497fbb0dd"
+  },
+  "checks": {
+    "group_disjoint": {
+      "passed": true,
+      "value": {}
+    },
+    "pair_disjoint_exact": {
+      "passed": true,
+      "value": {}
+    },
+    "pair_disjoint_normalized": {
+      "passed": true,
+      "value": {}
+    },
+    "single_side_overlap": {
+      "passed": true,
+      "value": {
+        "dev": {
+          "qom": 3,
+          "es": 0
+        },
+        "test": {
+          "qom": 1,
+          "es": 1
+        }
+      }
+    },
+    "bible_verse_adjacency": {
+      "passed": true,
+      "value": null
+    },
+    "forced_partitions": {
+      "passed": true,
+      "value": {}
+    },
+    "realized_fractions": {
+      "passed": true,
+      "value": {
+        "realized": {
+          "train": 0.795676429567643,
+          "dev": 0.09937238493723849,
+          "test": 0.10495118549511855
+        },
+        "drift": {
+          "train": -0.0043,
+          "dev": -0.0006,
+          "test": 0.005
+        }
+      }
+    },
+    "partition_coverage": {
+      "passed": true,
+      "value": {
+        "missing": 0,
+        "extra": 0,
+        "duplicated": 0
+      }
+    },
+    "no_line_level_groups": {
+      "passed": true,
+      "value": 0
+    },
+    "titles_share_parent_group": {
+      "passed": true,
+      "value": 0
+    }
+  },
+  "runtime": {
+    "qomlaq": "2.1.0",
+    "code_fingerprint": "sha256:e9f2654ca297f04ad46210af5d8bc31b522c9f58b9dc552b747cee2b8d272d00",
+    "python": "3.14.6",
+    "pandas": "3.0.5",
+    "numpy": "2.5.2",
+    "sacrebleu": "2.6.0"
+  },
+  "split_sha256": "001062cde908e3b092d6c43574dcc751aec414c96e1a29c4b0b716e1835d5874"
+}

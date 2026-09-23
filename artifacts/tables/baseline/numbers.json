@@ -1,0 +1,50 @@
+{
+  "experiment": "baseline",
+  "corpus": "text-v1",
+  "corpus_sha256": "83de6a5612693312fd0c2309bba64cfd3d06a99d5598b1cd15d4af737a5042f9",
+  "primary_metric": "chrF2++",
+  "splits": {
+    "base/stratified": "07f90bfee0bcd2d3ad41e8899b5c5b0025fd513d85037384a976d4b282fbb95e",
+    "base/random": "001062cde908e3b092d6c43574dcc751aec414c96e1a29c4b0b716e1835d5874",
+    "base_bible/stratified__chapter": "3e16af8bcd7443a67536ed6d28a7b37bf20315b3468edbc310bc1fc383cba943",
+    "base_bible/random__chapter": "39c79fd59fa7d36158fe1d68f7550d70b77393c63e30eab2121bf0e2b2f208a2",
+    "bible_only/random__chapter": "f030d4aca03da5b33fe12164f2139401dcff9f01f23c52ea5ac897a5108f79ef",
+    "base_bible/stratified__verse": "45f6fdd25f8a200ba27a1e1b78e8d39646ff881c9d054620a2219f6165fd37ca"
+  },
+  "records": [
+    {
+      "experiment": "baseline",
+      "run_id": "base__stratified__es2qom",
+      "config": "base",
+      "strategy": "stratified",
+      "bible_grouping": "chapter",
+      "direction": "es2qom",
+      "split_id": "base/stratified",
+      "partition": "test",
+      "n_pairs": 300,
+      "contaminated": false,
+      "chrF2++": 31.1308,
+      "chrF2": 34.3272,
+      "BLEU": 7.3649
+    }
+  ],
+  "evaluations": {
+    "domain-shift": [
+      {
+        "experiment": "baseline",
+        "run_id": "base__stratified__es2qom",
+        "config": "base",
+        "strategy": "stratified",
+        "bible_grouping": "chapter",
+        "direction": "es2qom",
+        "split_id": "base/stratified",
+        "partition": "test",
+        "n_pairs": 300,
+        "contaminated": false,
+        "chrF2++": 31.1308,
+        "chrF2": 34.3272,
+        "BLEU": 7.3649
+      }
+    ]
+  }
+}

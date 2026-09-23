@@ -1,0 +1,261 @@
+{
+  "schema_version": "2.0.0",
+  "package_version": "2.1.0",
+  "code_fingerprint": "sha256:e9f2654ca297f04ad46210af5d8bc31b522c9f58b9dc552b747cee2b8d272d00",
+  "built_utc": "2026-09-23T13:05:44+00:00",
+  "corpus": "text-v1",
+  "configs": [
+    "base",
+    "base_bible",
+    "bible_only"
+  ],
+  "data_dir": "corpus",
+  "qc": {
+    "min_tokens": 2,
+    "len_ratio_min": 0.15,
+    "len_ratio_max": 6.0,
+    "max_chars": 800,
+    "dedup_scope": "within_source"
+  },
+  "source_files": {
+    "Arte verbal qom.xlsx": "7a7cbad18b7f6d52e0dbd54fda8484ef42a393a9a346dee035e8a56836166c69",
+    "Educación Sanitaria Intercultural.xlsx": "940444282d2d16c17c43995292b6afbf4a1d68d6a8c8a633393460f8c2729d02",
+    "Materiales del Taller de Lengua y Cultura Toba.xlsx": "17882dbe80048906fedd2db68adde87a9d4fb26106a83643fd033d952a6a5ad1",
+    "Las Aventuras de Copaic.xlsx": "41c68cc98e674e0186089d04861dff8d465f71abbd45c1804b971a316868575f",
+    "La Declaración Universal de los Derechos Humanos.xlsx": "d7ecb5f5cb9b072d8941ca99a863e49a5ed006b3cb474b7a4640e55c12482aa4",
+    "El Principito.csv": "3673666766adc9761f225b7a8ed7a3320a949aa139e296b9c1b32793e51ee01b",
+    "La Biblia.csv": "c2976c3763dd17ce375407fdd463ea9963e44363037bc1d1e26dd7cc3681a1c3"
+  },
+  "sources": [
+    {
+      "name": "Arte verbal qom",
+      "file": "Arte verbal qom.xlsx",
+      "raw_rows": 1891,
+      "after_qc": 1770,
+      "lines": 1711,
+      "titles": 59,
+      "groups": 69,
+      "unit_levels": [
+        "capitulo",
+        "fragmento"
+      ],
+      "qom_tokens": 16144,
+      "es_tokens": 14864,
+      "qom_len_mean": 9.12,
+      "qom_len_std": 5.35,
+      "es_len_mean": 8.4,
+      "es_len_std": 4.61,
+      "configs": [
+        "base",
+        "base_bible"
+      ],
+      "forced_partition": null
+    },
+    {
+      "name": "Educación Sanitaria Intercultural",
+      "file": "Educación Sanitaria Intercultural.xlsx",
+      "raw_rows": 214,
+      "after_qc": 211,
+      "lines": 166,
+      "titles": 45,
+      "groups": 45,
+      "unit_levels": [
+        "fragmento"
+      ],
+      "qom_tokens": 7436,
+      "es_tokens": 6342,
+      "qom_len_mean": 35.24,
+      "qom_len_std": 35.19,
+      "es_len_mean": 30.06,
+      "es_len_std": 30.59,
+      "configs": [
+        "base",
+        "base_bible"
+      ],
+      "forced_partition": null
+    },
+    {
+      "name": "Materiales del Taller de Lengua y Cultura Toba",
+      "file": "Materiales del Taller de Lengua y Cultura Toba.xlsx",
+      "raw_rows": 278,
+      "after_qc": 263,
+      "lines": 256,
+      "titles": 7,
+      "groups": 21,
+      "unit_levels": [
+        "fragmento",
+        "seccion"
+      ],
+      "qom_tokens": 2283,
+      "es_tokens": 1924,
+      "qom_len_mean": 8.68,
+      "qom_len_std": 4.88,
+      "es_len_mean": 7.32,
+      "es_len_std": 3.34,
+      "configs": [
+        "base",
+        "base_bible"
+      ],
+      "forced_partition": null
+    },
+    {
+      "name": "Las Aventuras de Copaic",
+      "file": "Las Aventuras de Copaic.xlsx",
+      "raw_rows": 16,
+      "after_qc": 16,
+      "lines": 16,
+      "titles": 0,
+      "groups": 1,
+      "unit_levels": [
+        "document"
+      ],
+      "qom_tokens": 560,
+      "es_tokens": 484,
+      "qom_len_mean": 35.0,
+      "qom_len_std": 26.95,
+      "es_len_mean": 30.25,
+      "es_len_std": 20.95,
+      "configs": [
+        "base",
+        "base_bible"
+      ],
+      "forced_partition": "test"
+    },
+    {
+      "name": "La Declaración Universal de los Derechos Humanos",
+      "file": "La Declaración Universal de los Derechos Humanos.xlsx",
+      "raw_rows": 61,
+      "after_qc": 58,
+      "lines": 58,
+      "titles": 0,
+      "groups": 32,
+      "unit_levels": [
+        "document",
+        "parte"
+      ],
+      "qom_tokens": 3618,
+      "es_tokens": 1885,
+      "qom_len_mean": 62.38,
+      "qom_len_std": 35.0,
+      "es_len_mean": 32.5,
+      "es_len_std": 18.94,
+      "configs": [
+        "base",
+        "base_bible"
+      ],
+      "forced_partition": null
+    },
+    {
+      "name": "El Principito",
+      "file": "El Principito.csv",
+      "raw_rows": 557,
+      "after_qc": 550,
+      "lines": 550,
+      "titles": 0,
+      "groups": 27,
+      "unit_levels": [
+        "capitulo"
+      ],
+      "qom_tokens": 16817,
+      "es_tokens": 15793,
+      "qom_len_mean": 30.58,
+      "qom_len_std": 25.98,
+      "es_len_mean": 28.71,
+      "es_len_std": 26.44,
+      "configs": [
+        "base",
+        "base_bible"
+      ],
+      "forced_partition": null
+    },
+    {
+      "name": "La Biblia",
+      "file": "La Biblia.csv",
+      "raw_rows": 30580,
+      "after_qc": 30449,
+      "lines": 30449,
+      "titles": 0,
+      "groups": 1173,
+      "unit_levels": [
+        "libro_capitulo"
+      ],
+      "qom_tokens": 1422512,
+      "es_tokens": 849684,
+      "qom_len_mean": 46.72,
+      "qom_len_std": 21.14,
+      "es_len_mean": 27.91,
+      "es_len_std": 12.1,
+      "configs": [
+        "base_bible",
+        "bible_only"
+      ],
+      "forced_partition": null
+    }
+  ],
+  "qc_ledger": [
+    {
+      "stage": "dedup_within_source",
+      "rows_before": 33597,
+      "rows_after": 33423,
+      "removed": 174,
+      "removed_by_source": {
+        "Arte verbal qom": 60,
+        "El Principito": 1,
+        "La Biblia": 108,
+        "Materiales del Taller de Lengua y Cultura Toba": 5
+      }
+    },
+    {
+      "stage": "len_ratio",
+      "rows_before": 33423,
+      "rows_after": 33407,
+      "removed": 16,
+      "removed_by_source": {
+        "La Biblia": 16
+      }
+    },
+    {
+      "stage": "min_tokens",
+      "rows_before": 33407,
+      "rows_after": 33334,
+      "removed": 73,
+      "removed_by_source": {
+        "Arte verbal qom": 61,
+        "Educación Sanitaria Intercultural": 1,
+        "La Declaración Universal de los Derechos Humanos": 1,
+        "Materiales del Taller de Lengua y Cultura Toba": 10
+      }
+    },
+    {
+      "stage": "max_chars",
+      "rows_before": 33334,
+      "rows_after": 33317,
+      "removed": 17,
+      "removed_by_source": {
+        "Educación Sanitaria Intercultural": 2,
+        "El Principito": 6,
+        "La Biblia": 7,
+        "La Declaración Universal de los Derechos Humanos": 2
+      }
+    }
+  ],
+  "counts": {
+    "rows": 33317,
+    "lines": 33206,
+    "titles": 111,
+    "groups": 1368,
+    "base_rows": 2868,
+    "base_bible_rows": 33317,
+    "bible_only_rows": 30449
+  },
+  "cross_source_duplicate_rows": 0,
+  "runtime": {
+    "qomlaq": "2.1.0",
+    "code_fingerprint": "sha256:e9f2654ca297f04ad46210af5d8bc31b522c9f58b9dc552b747cee2b8d272d00",
+    "python": "3.14.6",
+    "pandas": "3.0.5",
+    "numpy": "2.5.2",
+    "sacrebleu": "2.6.0"
+  },
+  "corpus_sha256": "83de6a5612693312fd0c2309bba64cfd3d06a99d5598b1cd15d4af737a5042f9"
+}

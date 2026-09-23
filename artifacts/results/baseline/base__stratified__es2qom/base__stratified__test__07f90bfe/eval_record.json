@@ -1,0 +1,142 @@
+{
+  "schema_version": "2.0.0",
+  "evaluated_utc": "2026-08-10T03:53:40+00:00",
+  "run_id": "base__stratified__es2qom",
+  "model_card": {
+    "run_id": "base__stratified__es2qom",
+    "config": "base",
+    "strategy": "stratified",
+    "bible_grouping": "chapter",
+    "direction": "es2qom",
+    "src_lang": "spa_Latn",
+    "tgt_lang": "grn_Latn",
+    "split_id": "base/stratified",
+    "split_sha256": "07f90bfee0bcd2d3ad41e8899b5c5b0025fd513d85037384a976d4b282fbb95e",
+    "corpus_sha256": "83de6a5612693312fd0c2309bba64cfd3d06a99d5598b1cd15d4af737a5042f9",
+    "corpus_sha8": "83de6a56",
+    "base_model": "facebook/nllb-200-distilled-600M",
+    "training": {
+      "learning_rate": 0.0005,
+      "per_device_batch_size": 2,
+      "gradient_accumulation_steps": 8,
+      "num_train_epochs": 10,
+      "early_stopping_patience": 2,
+      "max_length": 256,
+      "fp16": true,
+      "optim": "adafactor",
+      "seed": 42,
+      "effective_batch_size": 16,
+      "truncation": {
+        "train": {
+          "rows": 2280,
+          "src_over_limit": 0,
+          "tgt_over_limit": 2,
+          "src_p95_tokens": 63,
+          "tgt_p95_tokens": 103
+        },
+        "dev": {
+          "rows": 288,
+          "src_over_limit": 0,
+          "tgt_over_limit": 2,
+          "src_p95_tokens": 69,
+          "tgt_p95_tokens": 115
+        },
+        "test": {
+          "rows": 300,
+          "src_over_limit": 0,
+          "tgt_over_limit": 2,
+          "src_p95_tokens": 78,
+          "tgt_p95_tokens": 134
+        }
+      }
+    },
+    "selection": {
+      "criterion": "eval_loss",
+      "best_epoch": 3.0,
+      "best_eval_loss": 2.2708778381347656,
+      "epochs_run": 5,
+      "early_stopping_patience": 2,
+      "eval_loss_by_epoch": [
+        {
+          "epoch": 1.0,
+          "eval_loss": 2.4746882915496826
+        },
+        {
+          "epoch": 2.0,
+          "eval_loss": 2.2711267471313477
+        },
+        {
+          "epoch": 3.0,
+          "eval_loss": 2.2708778381347656
+        },
+        {
+          "epoch": 4.0,
+          "eval_loss": 2.4181294441223145
+        },
+        {
+          "epoch": 5.0,
+          "eval_loss": 2.6565752029418945
+        }
+      ]
+    },
+    "package_version": "2.0.0",
+    "code_fingerprint": "sha256:861d96a904988b7fa63a4a4b4a5b36e84931ea1cca31cf6593800248b68013b0",
+    "runtime": {
+      "qomlaq": "2.0.0",
+      "code_fingerprint": "sha256:861d96a904988b7fa63a4a4b4a5b36e84931ea1cca31cf6593800248b68013b0",
+      "python": "3.12.13",
+      "pandas": "2.3.3",
+      "numpy": "2.0.2",
+      "sacrebleu": "2.6.0",
+      "torch": "2.10.0+cu128",
+      "transformers": "5.0.0"
+    }
+  },
+  "split_id": "base/stratified",
+  "split_sha256": "07f90bfee0bcd2d3ad41e8899b5c5b0025fd513d85037384a976d4b282fbb95e",
+  "partition": "test",
+  "cross_split": false,
+  "n_pairs": 300,
+  "overlap": {
+    "overlap": 0,
+    "n": 300,
+    "frac": 0.0
+  },
+  "contaminated": false,
+  "scores": {
+    "chrF2++": 31.1308,
+    "chrF2": 34.3272,
+    "BLEU": 7.3649
+  },
+  "signatures": {
+    "chrF2++": "nrefs:1|case:mixed|eff:yes|nc:6|nw:2|space:no|version:2.6.0",
+    "chrF2": "nrefs:1|case:mixed|eff:yes|nc:6|nw:0|space:no|version:2.6.0",
+    "BLEU": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0"
+  },
+  "per_source": {
+    "Arte verbal qom": 41.4253,
+    "Educación Sanitaria Intercultural": 34.0145,
+    "El Principito": 25.3226,
+    "La Declaración Universal de los Derechos Humanos": 29.0041,
+    "Las Aventuras de Copaic": 24.5509,
+    "Materiales del Taller de Lengua y Cultura Toba": 25.5861
+  },
+  "generation": {
+    "num_beams": 4,
+    "no_repeat_ngram_size": 3,
+    "max_new_tokens": 256,
+    "max_source_length": 256,
+    "batch_size": 8
+  },
+  "primary_metric": "chrF2++",
+  "runtime": {
+    "qomlaq": "2.0.0",
+    "code_fingerprint": "sha256:861d96a904988b7fa63a4a4b4a5b36e84931ea1cca31cf6593800248b68013b0",
+    "python": "3.12.13",
+    "pandas": "2.3.3",
+    "numpy": "2.0.2",
+    "sacrebleu": "2.6.0",
+    "torch": "2.10.0+cu128",
+    "transformers": "5.0.0"
+  }
+}

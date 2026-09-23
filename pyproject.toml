@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qomlaq"
+dynamic = ["version"]
+description = "Reproducible corpus, split, training and evaluation pipeline for QomL'aqtaqa Qom-Spanish MT"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+# Pinned deliberately: metric values depend on the sacrebleu version, and split
+# reproducibility depends on pandas' groupby/sort behaviour. Every artifact records
+# the resolved versions (see qomlaq.runtime_versions).
+dependencies = [
+    "pandas>=2.0,<4",
+    "numpy>=1.24",
+    "openpyxl>=3.1,<4",
+    "sacrebleu==2.6.0",
+    "tomli>=2.0; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+# The first training runs used transformers 5.0.0; every model card records the version
+# that actually ran.
+train = [
+    "torch>=2.0",
+    "transformers>=5.0,<6",
+    "datasets>=2.14",
+    "sentencepiece>=0.1.99",
+]
+report = ["XlsxWriter>=3.1"]
+dev = ["pytest>=7.4", "pytest-xdist>=3.5"]
+
+[project.scripts]
+qomlaq = "qomlaq.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "qomlaq.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "corpus: requires the raw corpus/ directory (skipped when absent)",
+    "gpu: requires a GPU and the [train] extra",
+]
+filterwarnings = ["ignore::DeprecationWarning"]

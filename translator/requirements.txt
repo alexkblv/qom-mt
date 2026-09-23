@@ -1,0 +1,22 @@
+# Pins are load-bearing, not hygiene.
+#
+# The qom-mt-v2 checkpoints declare tie_word_embeddings: true but store a
+# trained lm_head that differs from model.shared in every row. app.py overrides
+# the flag at load time, but whether a given transformers release honors that
+# override is version-specific -- and getting it wrong produces fluent-looking
+# garbage rather than an error. These are the versions smoke_test.py was last
+# run green against. Re-run it after changing any of them.
+#
+# The extra index makes torch resolve to 2.14.0+cpu on a Linux server
+# (the PyPI default carries CUDA and is ~2 GB of dead weight there),
+# while still resolving to plain 2.14.0 on macOS for local development.
+
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+gradio==6.26.0
+transformers==5.16.1
+torch==2.14.0
+sentencepiece==0.2.2
+huggingface_hub==1.30.0
+
+# The qomlaq package itself comes from this repository: pip install -e ..

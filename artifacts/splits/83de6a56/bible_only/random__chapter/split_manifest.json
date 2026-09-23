@@ -1,0 +1,132 @@
+{
+  "schema_version": "2.0.0",
+  "package_version": "2.1.0",
+  "code_fingerprint": "sha256:e9f2654ca297f04ad46210af5d8bc31b522c9f58b9dc552b747cee2b8d272d00",
+  "built_utc": "2026-09-23T13:05:46+00:00",
+  "split_id": "bible_only/random__chapter",
+  "purpose": "headline",
+  "config": "bible_only",
+  "strategy": "random",
+  "bible_grouping": "chapter",
+  "corpus_sha256": "83de6a5612693312fd0c2309bba64cfd3d06a99d5598b1cd15d4af737a5042f9",
+  "corpus": "text-v1",
+  "corpus_sha8": "83de6a56",
+  "seed": 42,
+  "target_fractions": {
+    "train": 0.8,
+    "dev": 0.1,
+    "test": 0.1
+  },
+  "forced_partitions": {},
+  "realized": {
+    "train": {
+      "rows": 24358,
+      "groups": 789,
+      "fraction": 0.8
+    },
+    "dev": {
+      "rows": 3046,
+      "groups": 192,
+      "fraction": 0.1
+    },
+    "test": {
+      "rows": 3045,
+      "groups": 192,
+      "fraction": 0.1
+    }
+  },
+  "per_source_rows": {
+    "train": {
+      "La Biblia": 24358
+    },
+    "dev": {
+      "La Biblia": 3046
+    },
+    "test": {
+      "La Biblia": 3045
+    }
+  },
+  "partition_sha256": {
+    "train": "c5c509a0807b009929407f5473a927c17fc8a50d337f2e4a39acd4cd6e9cdc4a",
+    "dev": "7f7172c711798022e7090851b91042b4099b427a7c26c4fedbf93e4456705a21",
+    "test": "edd7b49517027d38c20ffd69651bbf4a371dc2bc98cf17e9e6dd996969e388bb"
+  },
+  "checks": {
+    "group_disjoint": {
+      "passed": true,
+      "value": {}
+    },
+    "pair_disjoint_exact": {
+      "passed": true,
+      "value": {}
+    },
+    "pair_disjoint_normalized": {
+      "passed": true,
+      "value": {}
+    },
+    "single_side_overlap": {
+      "passed": true,
+      "value": {
+        "dev": {
+          "qom": 2,
+          "es": 31
+        },
+        "test": {
+          "qom": 2,
+          "es": 30
+        }
+      }
+    },
+    "bible_verse_adjacency": {
+      "passed": true,
+      "value": {
+        "dev": 0.0,
+        "test": 0.0
+      }
+    },
+    "forced_partitions": {
+      "passed": true,
+      "value": {}
+    },
+    "realized_fractions": {
+      "passed": true,
+      "value": {
+        "realized": {
+          "train": 0.7999605898387467,
+          "dev": 0.1000361259811488,
+          "test": 0.10000328418010444
+        },
+        "drift": {
+          "train": -0.0,
+          "dev": 0.0,
+          "test": 0.0
+        }
+      }
+    },
+    "partition_coverage": {
+      "passed": true,
+      "value": {
+        "missing": 0,
+        "extra": 0,
+        "duplicated": 0
+      }
+    },
+    "no_line_level_groups": {
+      "passed": true,
+      "value": 0
+    },
+    "titles_share_parent_group": {
+      "passed": true,
+      "value": null
+    }
+  },
+  "runtime": {
+    "qomlaq": "2.1.0",
+    "code_fingerprint": "sha256:e9f2654ca297f04ad46210af5d8bc31b522c9f58b9dc552b747cee2b8d272d00",
+    "python": "3.14.6",
+    "pandas": "3.0.5",
+    "numpy": "2.5.2",
+    "sacrebleu": "2.6.0"
+  },
+  "split_sha256": "f030d4aca03da5b33fe12164f2139401dcff9f01f23c52ea5ac897a5108f79ef"
+}

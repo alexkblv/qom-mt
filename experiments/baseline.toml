@@ -1,0 +1,83 @@
+# NLLB-200-distilled-600M fine-tuned on the seven text sources, with the corpus
+# configurations and split strategies of the AmericasNLP 2026 paper.
+#
+# This file is also the reference for the experiment format. Run ids, output paths and
+# report tables for this experiment all come from it; nothing about the experiment is
+# declared anywhere else. A new experiment is a new file next to this one.
+
+description = "NLLB-600M on the seven text sources"
+
+# A named corpus version (qomlaq.config.CORPORA).
+corpus = "text-v1"
+
+# A model profile (qomlaq.config.MODELS): the base checkpoint and its batch settings.
+model = "nllb-600m"
+
+# Every split below is trained in each of these directions.
+directions = ["es2qom", "qom2es"]
+
+# Training recipe overrides. Anything not listed comes from qomlaq.config.TrainingConfig.
+# This experiment uses the defaults.
+# [training]
+# learning_rate = 5e-4
+
+# Training can start from another checkpoint in place of the model profile's base:
+# a Hugging Face id or local path, or another experiment's run, where {direction} is
+# filled in per run.
+# init_from = { experiment = "baseline", run = "base__stratified__{direction}" }
+
+# Splits. `sha256` pins a split: build fails if the split comes out different, and
+# training and evaluation refuse to run on a split with no pin. `qomlaq build` prints the
+# hash of a new split so it can be pinned once agreed. `bible_grouping` only applies to
+# configurations that include the Bible.
+
+[[splits]]
+config = "base"
+strategy = "stratified"
+sha256 = "07f90bfee0bcd2d3ad41e8899b5c5b0025fd513d85037384a976d4b282fbb95e"
+
+[[splits]]
+config = "base"
+strategy = "random"
+sha256 = "001062cde908e3b092d6c43574dcc751aec414c96e1a29c4b0b716e1835d5874"
+
+[[splits]]
+config = "base_bible"
+strategy = "stratified"
+bible_grouping = "chapter"
+sha256 = "3e16af8bcd7443a67536ed6d28a7b37bf20315b3468edbc310bc1fc383cba943"
+
+[[splits]]
+config = "base_bible"
+strategy = "random"
+bible_grouping = "chapter"
+sha256 = "39c79fd59fa7d36158fe1d68f7550d70b77393c63e30eab2121bf0e2b2f208a2"
+
+[[splits]]
+config = "bible_only"
+strategy = "random"
+bible_grouping = "chapter"
+sha256 = "f030d4aca03da5b33fe12164f2139401dcff9f01f23c52ea5ac897a5108f79ef"
+
+# A control: the Bible grouped verse by verse, to measure what chapter grouping is
+# worth. Reports never put a control run in a results table.
+[[splits]]
+config = "base_bible"
+strategy = "stratified"
+bible_grouping = "verse"
+purpose = "control"
+sha256 = "45f6fdd25f8a200ba27a1e1b78e8d39646ff881c9d054620a2219f6165fd37ca"
+
+# Extra evaluations: several runs scored on one shared partition. Every run is also
+# scored on its own split's test set without being listed here. A run from another
+# experiment is written as "experiment/run_id".
+[[evaluations]]
+name = "domain-shift"
+split = "base/stratified"
+partition = "test"
+runs = [
+    "base__stratified__es2qom",
+    "base__stratified__qom2es",
+    "bible_only__random__es2qom",
+    "bible_only__random__qom2es",
+]
