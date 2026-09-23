@@ -1,6 +1,6 @@
 """Regression tests against the real corpus.
 
-Skipped automatically when ``corpus/`` is absent (it is gitignored for copyright), so a
+Skipped automatically when ``corpus/`` is absent (it is not distributed), so a
 fresh clone still runs the unit suite.
 """
 

@@ -12,7 +12,7 @@ CORPUS_DIR = REPO_ROOT / "corpus"
 def pytest_collection_modifyitems(config, items):
     """Skip corpus-backed tests when the raw sources are not present.
 
-    The corpus is gitignored (copyright), so a fresh clone runs the unit tests only.
+    The corpus is not distributed, so a fresh clone runs the unit tests only.
     """
     if CORPUS_DIR.exists():
         return

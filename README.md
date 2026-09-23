@@ -20,7 +20,7 @@ qom/
 ├── translator/          # web demo (Gradio) that serves the models through qomlaq
 ├── tests/               # CPU-only test suite (no GPU, no corpus needed for unit tests)
 ├── artifacts/           # generated: manifests, split hashes, results, tables
-├── corpus/              # raw sources (not distributed; see Notes)
+├── corpus/              # raw sources (not distributed)
 └── legacy/              # the notebooks behind the AmericasNLP 2026 paper, with outputs
 ```
 
@@ -194,10 +194,3 @@ published.
 
 Corpus construction involved collaboration with linguists Paola Cúneo and Temis Tacconi.
 Parallelization of *La Biblia* and *El Principito* was led by Pablo Laciana (UBA).
-
-## Notes
-
-- **Bible copyright.** The copyright status of *La Biblia* for training use is unresolved;
-  results relying on Bible data should be read accordingly.
-- **Data release.** The processed corpus is not yet released. A public release is planned
-  for a future version incorporating ongoing recording, transcription and translation work.
