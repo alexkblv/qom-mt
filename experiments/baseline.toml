@@ -75,9 +75,13 @@ sha256 = "45f6fdd25f8a200ba27a1e1b78e8d39646ff881c9d054620a2219f6165fd37ca"
 name = "domain-shift"
 split = "base/stratified"
 partition = "test"
+# The stratified with-Bible split keeps this test set out of training. The random one
+# doesn't, so its runs can't be scored here.
 runs = [
     "base__stratified__es2qom",
     "base__stratified__qom2es",
+    "base_bible__stratified__es2qom",
+    "base_bible__stratified__qom2es",
     "bible_only__random__es2qom",
     "bible_only__random__qom2es",
 ]
