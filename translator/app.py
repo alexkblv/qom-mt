@@ -61,8 +61,9 @@ def subfolder(direction: str) -> str:
 # ---------------------------------------------------------------------------
 # Loading
 #
-# One-slot cache: hold only the most recently used model so a small machine
-# (2 vCPU / 16 GB RAM) never tries to load two ~2.8 GB checkpoints at once.
+# One-slot cache: hold only the most recently used model. Loaded in float32,
+# each direction takes ~5.6 GB, so two at once would double the memory the
+# host needs.
 # ---------------------------------------------------------------------------
 
 _cache = {"key": None, "tok": None, "model": None}
@@ -117,6 +118,10 @@ def _load(direction_key):
         subfolder=subfolder(direction),
         token=token,
         tie_word_embeddings=False,  # see module docstring; not optional
+        # The checkpoints are float16, but PyTorch's float16 matmul on x86 CPUs
+        # without AVX512-FP16 takes a fallback path 40-500x slower than float32
+        # (pytorch/pytorch#146508), and Cloud Run doesn't say which CPU it uses.
+        dtype=torch.float32,
     )
     _assert_untied(model)
     model.eval()
@@ -137,6 +142,8 @@ def translate(text, direction_key):
         return ""
 
     language = LANGUAGES[DIRECTIONS[direction_key]]
+    if _cache["key"] != direction_key:
+        gr.Info(LOADING_MESSAGE)
     tok, model = _load(direction_key)
     loaded = LoadedModel(model=model, tokenizer=tok, device=str(model.device))
 
@@ -178,6 +185,19 @@ PLACEHOLDERS = {
     "Qom": "Escribí un texto en qom",
     "Español": "Escribí un texto en español",
 }
+
+#: Cloud Run stops the server when nobody uses it, so a visit can start with no
+#: model in memory, and each direction has its own model to download and load.
+WAIT_NOTE = (
+    "El servidor se apaga cuando nadie lo usa, así que la primera traducción "
+    "puede tardar uno o dos minutos. Lo mismo pasa la primera vez que cambiás "
+    "de dirección. Después tarda unos segundos."
+)
+
+LOADING_MESSAGE = "Cargando el modelo. La primera vez puede tardar uno o dos minutos."
+
+#: Runs in the browser, so typing doesn't send the server a request per keystroke.
+COUNT_CHARS_JS = "(text) => `${[...(text ?? '')].length} caracteres`"
 
 THEME = gr.themes.Soft(
     primary_hue="emerald",
@@ -257,22 +277,22 @@ def swap(direction, tgt_text):
     )
 
 
-def count_chars(text):
-    return f"{len(text or '')} caracteres"
-
-
 _src0, _tgt0 = LANG_LABELS[DEFAULT_DIRECTION]
 
 with gr.Blocks(
     title="Traductor Qom - Español (beta)", analytics_enabled=False
 ) as demo:
-    direction = gr.State(DEFAULT_DIRECTION)
+    # The direction lives in a hidden textbox. A gr.State would make Gradio keep
+    # a heartbeat connection open for every open tab, and on Cloud Run an open
+    # connection keeps the instance running and billed.
+    direction = gr.Textbox(DEFAULT_DIRECTION, visible=False)
 
     with gr.Column(elem_id="app-wrap"):
         gr.Markdown("## Traductor Qom – Español", elem_id="title")
         gr.Markdown(
             "Versión de prueba. Traducción automática experimental: los resultados "
-            "pueden contener errores y no deben usarse como traducción de referencia.",
+            "pueden contener errores y no deben usarse como traducción de referencia."
+            "\n\n" + WAIT_NOTE,
             elem_id="subtitle",
         )
 
@@ -309,7 +329,7 @@ with gr.Blocks(
 
         btn = gr.Button("Traducir", variant="primary", elem_id="go-btn")
 
-    src.change(count_chars, inputs=src, outputs=counter, show_progress="hidden")
+    src.change(None, inputs=src, outputs=counter, js=COUNT_CHARS_JS)
     swap_btn.click(
         swap,
         inputs=[direction, tgt],
@@ -326,8 +346,10 @@ demo.queue(max_size=20, default_concurrency_limit=1)
 
 if __name__ == "__main__":
     if PRELOAD:
-        # Pay the load once at boot, where the Space shows a starting state,
-        # rather than on the first visitor's request, where it looks hung.
+        # Load at boot, so a bad token or pin fails before the UI opens. The
+        # container sets QOM_PRELOAD=0: Cloud Run holds a visitor's first
+        # request until the app listens, so there the model loads on the first
+        # translation instead, where the UI can say that it's loading.
         print(f"Preloading {DEFAULT_DIRECTION} ...", flush=True)
         _load(DEFAULT_DIRECTION)
         print("Ready.", flush=True)
