@@ -115,14 +115,16 @@ just for this server.
 
     gcloud auth login
     gcloud config set project PROJECT_ID
-    ./cloudrun.sh setup      # once; asks for the token
+    ./cloudrun.sh setup      # once; copy the token first
     ./cloudrun.sh deploy
     ./cloudrun.sh publish    # when you want anyone to open it
 
 `setup` turns on the APIs, creates a service account that can only read the token,
 stores the token in Secret Manager, and sets Artifact Registry to keep only the two
-newest images. It's safe to run again. `deploy` builds the last commit on Cloud Build and
-deploys it, and it stops if a file it uploads has uncommitted changes.
+newest images. It's safe to run again. On a Mac, the token comes from the clipboard, so
+it never passes through the terminal, and the clipboard is cleared afterward. `deploy`
+builds the last commit on Cloud Build and deploys it, and it stops if a file it uploads
+has uncommitted changes.
 
 A new service starts private. To try it before anyone else can, run `gcloud run services
 proxy qom-translator --region us-central1` and open http://localhost:8080. `publish` lets
@@ -132,8 +134,8 @@ whichever access the service has.
 The upload is a `git archive` of `pyproject.toml`, `README.md`, `src/` and the
 translator's `app.py`, `requirements.txt` and `Dockerfile`. Untracked files, like the
 corpus, `private/` and `.env`, can't get into it. `./cloudrun.sh stage DIR` writes the
-same files to `DIR` so you can check them. After rotating the token, `./cloudrun.sh
-token` stores the new one, and new instances pick it up without a redeploy.
+same files to `DIR` so you can check them. After rotating the token, copy the new one
+and run `./cloudrun.sh token`. New instances pick it up without a redeploy.
 
 The settings in `cloudrun.sh` and the `Dockerfile`:
 

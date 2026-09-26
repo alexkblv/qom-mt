@@ -3,7 +3,7 @@
 # settings and the free tier.
 #
 #   ./cloudrun.sh setup       once per project: APIs, service account, image cleanup, token
-#   ./cloudrun.sh token       store a new Hugging Face token, e.g. after rotating it
+#   ./cloudrun.sh token       store the Hugging Face token you copied, e.g. after rotating it
 #   ./cloudrun.sh deploy      build the last commit on Cloud Build and deploy it
 #   ./cloudrun.sh publish     let anyone open it (a new service starts private)
 #   ./cloudrun.sh unpublish   make it private again
@@ -76,16 +76,22 @@ grant_token_access() {
     --role roles/secretmanager.secretAccessor >/dev/null
 }
 
+# The token is read from the clipboard on a Mac, so it never passes through the
+# terminal: copy it on huggingface.co, then run `cloudrun.sh token`.
 store_token() {
   local token
-  if [[ ! -t 0 ]]; then
+  if command -v pbpaste >/dev/null; then
+    token=$(pbpaste | tr -d '[:space:]')
+  elif [[ -t 0 ]]; then
+    read -rsp "Hugging Face token (nothing shows as you paste): " token
+    echo
+  else
     echo "The token prompt needs a terminal. Run: $0 token" >&2
     exit 1
   fi
-  read -rsp "Hugging Face token (fine-grained, read-only, qom-nlp/qom-mt-v2 only): " token
-  echo
   if [[ $token != hf_* ]]; then
-    echo "That isn't a Hugging Face token; they start with hf_." >&2
+    echo "No Hugging Face token found. Copy one on huggingface.co (it starts with hf_)," >&2
+    echo "fine-grained and read-only for qom-nlp/qom-mt-v2, then run: $0 token" >&2
     exit 1
   fi
   if gcloud secrets describe "$SECRET" --project "$PROJECT" >/dev/null 2>&1; then
@@ -95,7 +101,12 @@ store_token() {
       --replication-policy automatic --data-file=-
   fi
   grant_token_access
-  echo "Token stored."
+  if command -v pbcopy >/dev/null; then
+    pbcopy </dev/null
+    echo "Stored the ${#token}-character token and cleared the clipboard."
+  else
+    echo "Stored the ${#token}-character token."
+  fi
 }
 
 setup() {
