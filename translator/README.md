@@ -23,9 +23,9 @@ benchmarks multilingües principales; este traductor es una demostración de
 investigación, no un producto.
 
 **La primera traducción tarda.** El servidor se apaga cuando nadie lo usa. Si está
-apagado, la página tarda un poco en abrir, y la primera traducción en cada dirección
-puede tardar uno o dos minutos mientras se carga el modelo. Después, cada traducción
-tarda unos segundos.
+apagado, la página tarda alrededor de medio minuto en abrir, y la primera traducción en
+cada dirección puede tardar uno o dos minutos mientras se carga el modelo. Después, cada
+traducción tarda unos segundos.
 
 ## Cómo funciona
 
@@ -147,7 +147,8 @@ The settings in `cloudrun.sh` and the `Dockerfile`:
   running, and billed, for as long as the tab stays open.
 - **4 vCPU and 16 GiB.** One direction takes about 5.6 GB in float32. Cloud Run keeps
   downloaded files in memory, so once both directions have been used, the server also
-  holds both 2.8 GB checkpoints. More than 8 GiB needs 4 vCPU.
+  holds both 2.8 GB checkpoints. The first deploy peaked at about 9 GiB while loading
+  the second direction. More than 8 GiB needs 4 vCPU.
 - **us-central1 (Iowa).** The free tier is a discount at Tier 1 prices, so it covers the
   most in a Tier 1 region. São Paulo and Santiago are Tier 2.
 - **The model loads on the first translation** (`QOM_PRELOAD=0`). Cloud Run holds a
@@ -158,7 +159,7 @@ The settings in `cloudrun.sh` and the `Dockerfile`:
 Free tier, checked September 26, 2026: 180,000 vCPU-seconds, 360,000 GiB-seconds and 2
 million requests a month. At 16 GiB, memory runs out first, after about 6 hours of
 active server time a month. A visit that starts the server and translates both ways
-should use about 3 minutes of that, so the free tier covers roughly 120 such visits.
+uses about 3 minutes of that, so the free tier covers roughly 120 such visits.
 Visitors who come while the server is still up share its startup. Past the free tier,
 active time costs up to about $0.50 an hour. With one instance, even a server kept busy
 all month would cost at most about $350, so set a budget alert (Billing → Budgets &
@@ -166,13 +167,14 @@ alerts in the console) to hear about any charge by email. Cloud Build, Secret Ma
 and the source upload stay within their free tiers. The two kept images take about
 0.7 GB against 0.5 GB of free storage, which comes to roughly 2 cents a month.
 
-**The initial wait.** When the server is off, the page takes a little while to open as
-it starts. The first translation in each direction then downloads that direction's model
-from Hugging Face (2.8 GB) and loads it. That's the "uno o dos minutos" the app mentions
-under its title, and a "Cargando el modelo" notice shows while it happens. Later
-translations take a few seconds. These times are estimates until the first deploy, so
-check them then and adjust `WAIT_NOTE` in `app.py` if they're off. Wherever you link to
-the translator, mention the wait too, for example: «El traductor puede tardar uno o dos
+**The initial wait.** When the server is off, the page takes about 25 seconds to open
+while it starts. The first translation in each direction then downloads that
+direction's model from Hugging Face (2.8 GB) and loads it, which took about a minute
+(57 and 67 seconds) on the first deploy. That's the "uno o dos minutos" the app
+mentions under its title, and a "Cargando el modelo" notice shows while it happens.
+Later translations took 5 to 6 seconds, and switching back to a direction already used
+took about 11. If these change, adjust `WAIT_NOTE` in `app.py`. Wherever you link to the
+translator, mention the wait too, for example: «El traductor puede tardar uno o dos
 minutos en responder la primera vez, porque el servidor se apaga cuando nadie lo usa.»
 
 ## Later (out of scope for the beta)
