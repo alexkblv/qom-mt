@@ -263,17 +263,22 @@ def _other(direction):
     return "Español -> Qom" if direction == "Qom -> Español" else "Qom -> Español"
 
 
-def swap(direction, tgt_text):
-    """Flip the pair and carry the translation up into the source box, the way
-    a translator UI is expected to behave."""
+def swap(direction, src_text, tgt_text):
+    """Flip the pair and swap the two texts, the way a translator UI is expected
+    to behave. With no translation yet, the typed text stays where it is, so a
+    swap never deletes what someone wrote."""
     new_dir = _other(direction)
     src_lbl, tgt_lbl = LANG_LABELS[new_dir]
+    if tgt_text:
+        new_src, new_tgt = tgt_text, src_text or ""
+    else:
+        new_src, new_tgt = src_text or "", ""
     return (
         new_dir,
         src_lbl,
         tgt_lbl,
-        gr.update(value=tgt_text or "", placeholder=PLACEHOLDERS[src_lbl]),
-        "",
+        gr.update(value=new_src, placeholder=PLACEHOLDERS[src_lbl]),
+        new_tgt,
     )
 
 
@@ -332,7 +337,7 @@ with gr.Blocks(
     src.change(None, inputs=src, outputs=counter, js=COUNT_CHARS_JS)
     swap_btn.click(
         swap,
-        inputs=[direction, tgt],
+        inputs=[direction, src, tgt],
         outputs=[direction, src_label, tgt_label, src, tgt],
     )
     btn.click(
