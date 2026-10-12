@@ -8,6 +8,7 @@
     qomlaq evaluate EXPERIMENT RUN_ID ...     # score runs on their own test sets
     qomlaq evaluate EXPERIMENT --evaluation NAME
     qomlaq report EXPERIMENT                  # tables in artifacts/tables/EXPERIMENT/
+    qomlaq duplicates EXPERIMENT [--table CSV]  # exact and near-duplicates, before splitting
 """
 
 from __future__ import annotations
@@ -104,6 +105,18 @@ def _cmd_report(args) -> int:
     return 0
 
 
+def _cmd_duplicates(args) -> int:
+    import dataclasses
+
+    from .config import DUPLICATES
+    from .pipeline import duplicates
+
+    config = DUPLICATES if args.floor is None else dataclasses.replace(DUPLICATES, floor=args.floor)
+    duplicates(args.experiment, tables=args.table, config=config, data_dir=args.data_dir,
+               artifacts_dir=args.artifacts_dir)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     # Progress is the point of a long-running command; without this a piped run shows
     # nothing until it finishes.
@@ -159,6 +172,16 @@ def main(argv: list[str] | None = None) -> int:
     report = command("report", help="write an experiment's tables")
     report.add_argument("experiment")
     report.set_defaults(func=_cmd_report)
+
+    duplicates = command("duplicates", help="exact and near-duplicate rows, before splitting")
+    duplicates.add_argument("experiment")
+    duplicates.add_argument("--table", action="append", default=[], metavar="CSV",
+                            help="a parallel table outside the corpus registry (qom / español "
+                                 "columns), such as the speech corpus; repeatable")
+    duplicates.add_argument("--floor", type=float, default=None,
+                            help="lowest Jaccard written out for inspection "
+                                 "(default: qomlaq.config.DUPLICATES)")
+    duplicates.set_defaults(func=_cmd_duplicates)
 
     args = parser.parse_args(argv)
     try:

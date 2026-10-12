@@ -9,6 +9,7 @@ which is all a different machine needs.
     artifacts/models/<experiment>/<run>/model/     checkpoint + model card
     artifacts/results/<experiment>/<run>/<eval>/   eval record + hypotheses
     artifacts/tables/<experiment>/                 generated tables
+    artifacts/duplicates/<corpus>/                 duplicate check: tables + summary
 """
 
 from __future__ import annotations
@@ -83,6 +84,11 @@ def results_dir(experiment: str, run_id: str, split_id: str, partition: str,
 
 def tables_dir(experiment: str, root: str | Path | None = None) -> Path:
     return artifacts_dir(root) / "tables" / experiment
+
+
+def duplicates_dir(corpus: str, root: str | Path | None = None) -> Path:
+    """Output of the duplicate check for one corpus version."""
+    return artifacts_dir(root) / "duplicates" / corpus
 
 
 def find_model(experiment: str, run_id: str, root: str | Path | None = None) -> Path:

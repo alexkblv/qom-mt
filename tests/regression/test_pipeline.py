@@ -105,3 +105,22 @@ def test_a_rebuild_from_data_outside_the_repo_leaves_the_corpus_manifest(corpus_
     shutil.copytree(corpus_dir, elsewhere)
     build("baseline", data_dir=elsewhere, artifacts_dir=artifacts, rebuild=True, verbose=False)
     assert manifest.read_bytes() == before
+
+
+def test_duplicates_check_covers_the_whole_corpus_and_writes_next_to_it(built):
+    """The duplicate check reads the built corpus and reports every row of it."""
+    from qomlaq.config import DuplicatesConfig
+    from qomlaq.pipeline import duplicates
+
+    result, artifacts = built
+    report, out_dir = duplicates(
+        "baseline", artifacts_dir=artifacts,
+        config=DuplicatesConfig(floor=0.9, thresholds=(0.9, 1.0)), verbose=False,
+    )
+    assert out_dir == artifacts / "duplicates" / result.corpus.name
+    assert (out_dir / "summary.json").exists()
+    assert report.summary["rows"] == len(result.corpus.frame)
+    assert report.summary["method"]["thresholds"] == ["0.90", "1.00"]
+    # Groups sharing an identical pair are merged when the corpus is built, so a repeated
+    # pair can never sit in two discourse units.
+    assert report.summary["exact"]["pair"]["cross_group_blocks"] == 0

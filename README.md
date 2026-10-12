@@ -45,6 +45,7 @@ qomlaq train baseline base__stratified__es2qom
 qomlaq evaluate baseline base__stratified__es2qom
 qomlaq evaluate baseline --evaluation domain-shift
 qomlaq report baseline           # tables under artifacts/tables/baseline/
+qomlaq duplicates baseline --table extra.csv   # exact and near-duplicates, before splitting
 pytest                           # corpus-backed tests skip if corpus/ is absent
 ```
 
@@ -129,6 +130,17 @@ asserts that no other grapheme is touched.
 **Filtering.** Within-source exact deduplication; both sides non-empty and at least two
 tokens; token-length ratio (|ES|+1)/(|QOM|+1) within [0.15, 6.0]; both sides under 800
 characters. Every stage's removals are recorded in the corpus manifest.
+
+**Duplicates.** `qomlaq duplicates` checks the whole corpus, plus any parallel table that
+is not a registered source yet (`--table`, e.g. the speech transcriptions), before anything
+is split: exact repeats of a Qom side, a Spanish side or a whole pair after folding;
+*copied pairs*, where the Qom and Spanish words of one row overlap (word-level Jaccard, as
+Chiruzzo et al. 2022 did for Guarani, where reported speech was left untranslated); and
+*near-duplicate rows*, where two rows overlap on either side. Similarity is the Jaccard
+coefficient from `textdistance` over bags of words. Nothing is removed: the matches above
+an inspection floor go to `artifacts/duplicates/<corpus>/`, with the counts of pairs and
+rows at each candidate threshold (0.6 to 1.0) in `summary.json`, so a threshold can be
+chosen by reading the cases.
 
 ### Splits
 

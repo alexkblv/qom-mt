@@ -19,12 +19,15 @@ import dataclasses
 import json
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Sequence
 
 import pandas as pd
 
 from . import paths
 from .corpus import MANIFEST_NAME as CORPUS_MANIFEST
-from .corpus import CorpusArtifact, build_corpus, load_corpus, save_corpus
+from .config import DUPLICATES, DuplicatesConfig
+from .corpus import CorpusArtifact, CorpusError, build_corpus, load_corpus, save_corpus
+from .duplicates import DuplicatesReport, corpus_rows, duplicates_report, read_table, write_report
 from .experiments import Experiment, RunSpec, load_experiment
 from .splits import MANIFEST_NAME as SPLIT_MANIFEST
 from .splits import Split, load_split, write_split
@@ -417,3 +420,37 @@ def load_tables(experiment: str | Experiment, *,
     exp = _experiment(experiment)
     directory = paths.tables_dir(exp.name, artifacts_dir)
     return {path.stem: pd.read_csv(path) for path in sorted(directory.glob("*.csv"))}
+
+
+# ---------------------------------------------------------------------- duplicates
+
+
+def duplicates(
+    experiment: str | Experiment,
+    *,
+    tables: Sequence[str | Path] = (),
+    config: DuplicatesConfig = DUPLICATES,
+    data_dir: str | Path | None = None,
+    artifacts_dir: str | Path | None = None,
+    verbose: bool = True,
+) -> tuple[DuplicatesReport, Path]:
+    """Exact and near-duplicate check over an experiment's corpus plus any extra parallel
+    tables, written under ``artifacts/duplicates/<corpus>/``. Nothing is split or removed."""
+    exp = _experiment(experiment)
+    artifacts = paths.artifacts_dir(artifacts_dir)
+    try:
+        corpus = load_corpus(artifacts, exp.corpus)
+    except CorpusError:
+        corpus = build_corpus(paths.data_dir(data_dir), exp.corpus)
+
+    frames, inputs = [], []
+    for rows, info in [corpus_rows(corpus), *(read_table(path) for path in tables)]:
+        frames.append(rows)
+        inputs.append(info)
+    report = duplicates_report(pd.concat(frames, ignore_index=True), config=config,
+                               inputs=tuple(inputs))
+    out_dir = write_report(report, paths.duplicates_dir(exp.corpus, artifacts))
+    if verbose:
+        print(report.describe())
+        print(f"\nwritten to {out_dir}")
+    return report, out_dir

@@ -1,0 +1,287 @@
+{
+  "inputs": [
+    {
+      "name": "text-v1",
+      "corpus_sha256": "83de6a5612693312fd0c2309bba64cfd3d06a99d5598b1cd15d4af737a5042f9",
+      "rows": 33317
+    },
+    {
+      "name": "corpus_ciudad_universitaria.csv",
+      "sha256": "a9d2abecdd4dbd4360cd1ae57af4d001e0fa73e398982abf4efe3c81e954189e",
+      "rows": 536,
+      "dropped_empty": 6
+    }
+  ],
+  "rows": 33853,
+  "method": {
+    "words": "word_tokens(normalize_text(text).casefold())",
+    "similarity": "textdistance.Jaccard(qval=1, as_set=False): bag of words, multiplicities kept",
+    "exact": "fold_for_matching(text) on each side and on the pair",
+    "textdistance": "4.6.3",
+    "floor": 0.6,
+    "thresholds": [
+      "0.60",
+      "0.70",
+      "0.80",
+      "0.85",
+      "0.90",
+      "1.00"
+    ]
+  },
+  "exact": {
+    "qom": {
+      "blocks": 76,
+      "rows": 189,
+      "cross_source_blocks": 1,
+      "cross_group_blocks": 40
+    },
+    "es": {
+      "blocks": 385,
+      "rows": 809,
+      "cross_source_blocks": 8,
+      "cross_group_blocks": 326
+    },
+    "pair": {
+      "blocks": 25,
+      "rows": 53,
+      "cross_source_blocks": 0,
+      "cross_group_blocks": 0
+    }
+  },
+  "exact_by_source": {
+    "qom": {
+      "Arte verbal qom": 57,
+      "Educación Sanitaria Intercultural": 4,
+      "El Principito": 21,
+      "La Biblia": 100,
+      "Materiales del Taller de Lengua y Cultura Toba": 7
+    },
+    "es": {
+      "Arte verbal qom": 43,
+      "Educación Sanitaria Intercultural": 2,
+      "El Principito": 2,
+      "La Biblia": 752,
+      "Materiales del Taller de Lengua y Cultura Toba": 10
+    },
+    "pair": {
+      "Arte verbal qom": 14,
+      "Educación Sanitaria Intercultural": 2,
+      "El Principito": 2,
+      "La Biblia": 33,
+      "Materiales del Taller de Lengua y Cultura Toba": 2
+    }
+  },
+  "copied": {
+    "rows": {
+      "0.60": 55,
+      "0.70": 41,
+      "0.80": 40,
+      "0.85": 37,
+      "0.90": 34,
+      "1.00": 33
+    },
+    "rows_by_source": {
+      "0.60": {
+        "Arte verbal qom": 20,
+        "La Biblia": 28,
+        "corpus_ciudad_universitaria": 7
+      },
+      "0.70": {
+        "Arte verbal qom": 16,
+        "La Biblia": 19,
+        "corpus_ciudad_universitaria": 6
+      },
+      "0.80": {
+        "Arte verbal qom": 16,
+        "La Biblia": 19,
+        "corpus_ciudad_universitaria": 5
+      },
+      "0.85": {
+        "Arte verbal qom": 15,
+        "La Biblia": 19,
+        "corpus_ciudad_universitaria": 3
+      },
+      "0.90": {
+        "Arte verbal qom": 14,
+        "La Biblia": 19,
+        "corpus_ciudad_universitaria": 1
+      },
+      "1.00": {
+        "Arte verbal qom": 13,
+        "La Biblia": 19,
+        "corpus_ciudad_universitaria": 1
+      }
+    }
+  },
+  "near": {
+    "qom": {
+      "0.60": {
+        "pairs": 3859,
+        "rows": 2059,
+        "cross_group_pairs": 2421,
+        "cross_group_rows": 1315
+      },
+      "0.70": {
+        "pairs": 1663,
+        "rows": 1051,
+        "cross_group_pairs": 1070,
+        "cross_group_rows": 629
+      },
+      "0.80": {
+        "pairs": 799,
+        "rows": 574,
+        "cross_group_pairs": 501,
+        "cross_group_rows": 323
+      },
+      "0.85": {
+        "pairs": 578,
+        "rows": 399,
+        "cross_group_pairs": 375,
+        "cross_group_rows": 218
+      },
+      "0.90": {
+        "pairs": 346,
+        "rows": 305,
+        "cross_group_pairs": 213,
+        "cross_group_rows": 170
+      },
+      "1.00": {
+        "pairs": 245,
+        "rows": 190,
+        "cross_group_pairs": 178,
+        "cross_group_rows": 116
+      }
+    },
+    "es": {
+      "0.60": {
+        "pairs": 3803,
+        "rows": 3351,
+        "cross_group_pairs": 2836,
+        "cross_group_rows": 2641
+      },
+      "0.70": {
+        "pairs": 2189,
+        "rows": 2347,
+        "cross_group_pairs": 1731,
+        "cross_group_rows": 1927
+      },
+      "0.80": {
+        "pairs": 1393,
+        "rows": 1702,
+        "cross_group_pairs": 1132,
+        "cross_group_rows": 1429
+      },
+      "0.85": {
+        "pairs": 1026,
+        "rows": 1364,
+        "cross_group_pairs": 843,
+        "cross_group_rows": 1172
+      },
+      "0.90": {
+        "pairs": 815,
+        "rows": 1092,
+        "cross_group_pairs": 671,
+        "cross_group_rows": 939
+      },
+      "1.00": {
+        "pairs": 568,
+        "rows": 821,
+        "cross_group_pairs": 451,
+        "cross_group_rows": 692
+      }
+    },
+    "either": {
+      "0.60": {
+        "pairs": 5907,
+        "rows": 3996,
+        "cross_group_pairs": 4147,
+        "cross_group_rows": 3060
+      },
+      "0.70": {
+        "pairs": 3023,
+        "rows": 2704,
+        "cross_group_pairs": 2255,
+        "cross_group_rows": 2123
+      },
+      "0.80": {
+        "pairs": 1896,
+        "rows": 1971,
+        "cross_group_pairs": 1452,
+        "cross_group_rows": 1573
+      },
+      "0.85": {
+        "pairs": 1452,
+        "rows": 1574,
+        "cross_group_pairs": 1141,
+        "cross_group_rows": 1290
+      },
+      "0.90": {
+        "pairs": 1076,
+        "rows": 1261,
+        "cross_group_pairs": 857,
+        "cross_group_rows": 1051
+      },
+      "1.00": {
+        "pairs": 772,
+        "rows": 943,
+        "cross_group_pairs": 622,
+        "cross_group_rows": 784
+      }
+    }
+  },
+  "near_by_source": {
+    "0.60": {
+      "Arte verbal qom | Arte verbal qom": 286,
+      "Arte verbal qom | La Biblia": 4,
+      "Arte verbal qom | Materiales del Taller de Lengua y Cultura Toba": 25,
+      "Educación Sanitaria Intercultural | Educación Sanitaria Intercultural": 10,
+      "Educación Sanitaria Intercultural | El Principito": 1,
+      "El Principito | El Principito": 77,
+      "La Biblia | La Biblia": 5473,
+      "Materiales del Taller de Lengua y Cultura Toba | Materiales del Taller de Lengua y Cultura Toba": 26,
+      "corpus_ciudad_universitaria | corpus_ciudad_universitaria": 5
+    },
+    "0.70": {
+      "Arte verbal qom | Arte verbal qom": 125,
+      "Arte verbal qom | Materiales del Taller de Lengua y Cultura Toba": 16,
+      "Educación Sanitaria Intercultural | Educación Sanitaria Intercultural": 3,
+      "El Principito | El Principito": 34,
+      "La Biblia | La Biblia": 2835,
+      "Materiales del Taller de Lengua y Cultura Toba | Materiales del Taller de Lengua y Cultura Toba": 8,
+      "corpus_ciudad_universitaria | corpus_ciudad_universitaria": 2
+    },
+    "0.80": {
+      "Arte verbal qom | Arte verbal qom": 69,
+      "Arte verbal qom | Materiales del Taller de Lengua y Cultura Toba": 9,
+      "Educación Sanitaria Intercultural | Educación Sanitaria Intercultural": 3,
+      "El Principito | El Principito": 29,
+      "La Biblia | La Biblia": 1783,
+      "Materiales del Taller de Lengua y Cultura Toba | Materiales del Taller de Lengua y Cultura Toba": 2,
+      "corpus_ciudad_universitaria | corpus_ciudad_universitaria": 1
+    },
+    "0.85": {
+      "Arte verbal qom | Arte verbal qom": 59,
+      "Arte verbal qom | Materiales del Taller de Lengua y Cultura Toba": 9,
+      "Educación Sanitaria Intercultural | Educación Sanitaria Intercultural": 2,
+      "El Principito | El Principito": 19,
+      "La Biblia | La Biblia": 1361,
+      "Materiales del Taller de Lengua y Cultura Toba | Materiales del Taller de Lengua y Cultura Toba": 2
+    },
+    "0.90": {
+      "Arte verbal qom | Arte verbal qom": 57,
+      "Arte verbal qom | Materiales del Taller de Lengua y Cultura Toba": 9,
+      "Educación Sanitaria Intercultural | Educación Sanitaria Intercultural": 2,
+      "El Principito | El Principito": 19,
+      "La Biblia | La Biblia": 988,
+      "Materiales del Taller de Lengua y Cultura Toba | Materiales del Taller de Lengua y Cultura Toba": 1
+    },
+    "1.00": {
+      "Arte verbal qom | Arte verbal qom": 54,
+      "Arte verbal qom | Materiales del Taller de Lengua y Cultura Toba": 9,
+      "Educación Sanitaria Intercultural | Educación Sanitaria Intercultural": 2,
+      "El Principito | El Principito": 19,
+      "La Biblia | La Biblia": 687,
+      "Materiales del Taller de Lengua y Cultura Toba | Materiales del Taller de Lengua y Cultura Toba": 1
+    }
+  }
+}

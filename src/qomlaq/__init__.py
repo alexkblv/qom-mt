@@ -37,7 +37,7 @@ def runtime_versions() -> dict[str, str]:
         "code_fingerprint": code_fingerprint(),
         "python": platform.python_version(),
     }
-    for package in ("pandas", "numpy", "sacrebleu", "torch", "transformers"):
+    for package in ("pandas", "numpy", "sacrebleu", "textdistance", "torch", "transformers"):
         try:
             versions[package] = importlib.metadata.version(package)
         except importlib.metadata.PackageNotFoundError:

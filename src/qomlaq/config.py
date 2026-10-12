@@ -217,6 +217,33 @@ def config_has_verses(config: str) -> bool:
 
 
 @dataclass(frozen=True)
+class TableSpec:
+    """A parallel table that is not (yet) a registered source: the speech corpus in the
+    project's *formato computacional* (``index, location, speaker, audio, qom, español``,
+    one row per segment). ``ref_columns`` name a row for a human reader."""
+
+    col_qom: str = "qom"
+    col_es: str = "español"
+    ref_columns: tuple[str, ...] = ("speaker", "audio", "index")
+
+
+SPEECH_TABLE = TableSpec()
+
+
+@dataclass(frozen=True)
+class DuplicatesConfig:
+    """The duplicate check before splitting: the lowest word-level Jaccard written out
+    for inspection, and the thresholds counted side by side. 0.6 is where Chiruzzo et al.
+    (2022) searched; 0.8 and 0.85 are the cut-offs under discussion for this corpus."""
+
+    floor: float = 0.6
+    thresholds: tuple[float, ...] = (0.6, 0.7, 0.8, 0.85, 0.9, 1.0)
+
+
+DUPLICATES = DuplicatesConfig()
+
+
+@dataclass(frozen=True)
 class QCConfig:
     """Filters applied to every source identically."""
 

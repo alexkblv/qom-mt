@@ -71,7 +71,7 @@ def resolve_source_path(data_dir: Path, filename: str) -> Path:
     raise IngestError(f"source file {filename!r} not found in {data_dir}. Present: {present}")
 
 
-def _text_mask(frame: pd.DataFrame, col_qom: str, col_es: str) -> pd.Series:
+def text_mask(frame: pd.DataFrame, col_qom: str, col_es: str) -> pd.Series:
     """Rows where both sides carry real text. Index-preserving."""
     mask = pd.Series(True, index=frame.index)
     for col in (col_qom, col_es):
@@ -95,7 +95,7 @@ def _finalize(
     rows = rows.copy()
     rows["source_row"] = np.arange(len(rows), dtype="int64")
 
-    mask = _text_mask(rows, col_qom, col_es)
+    mask = text_mask(rows, col_qom, col_es)
     kept = rows.loc[mask]  # single filter; index (and therefore metadata) preserved
 
     out = pd.DataFrame(index=kept.index)
