@@ -144,13 +144,15 @@ rows at each candidate threshold (0.6 to 1.0) in `summary.json`, so a threshold 
 chosen by reading the cases.
 
 **Speech transcriptions.** `python -m qomlaq.speech` reads the Ciudad Universitaria
-transcription documents (.docx, alternating Qom and Spanish paragraphs under each audio
-header) and writes them in the project's *formato computacional* (`index, location,
-speaker, audio, qom, español`), one row per segment, plus a `revisión` column of notes for
-the linguists. It copies the text as it is: missing translations, merged lines, lines that
-don't read as Qom and encoding problems are reported, never fixed. The documents name
-their speakers, so they and the table stay outside the repository (`QOMLAQ_SPEECH_DIR`,
-default `corpus-speech/`).
+transcription documents (.docx: each audio part starts with its file name, followed by
+alternating Qom and Spanish lines) and writes two tables in the project's *formato
+computacional*: one row per line pair (`index, location, speaker, audio, qom, español`),
+for training and the duplicate check, and one row per audio part with its lines joined
+into a Qom paragraph and a Spanish one, the input for aligning text and audio. Both carry
+a `revisión` column of notes for the linguists. The text is copied as it is: missing
+translations, merged lines, lines that don't read as Qom and encoding problems are
+reported, never fixed. The documents name their speakers, so they and the tables stay
+outside the repository (`QOMLAQ_SPEECH_DIR`, default `corpus-speech/`).
 
 ### Splits
 

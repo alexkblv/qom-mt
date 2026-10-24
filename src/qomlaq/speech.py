@@ -1,28 +1,31 @@
-"""Turn the Ciudad Universitaria transcriptions (.docx) into the project's *formato
-computacional* table, plus one review column:
+"""Turn the Ciudad Universitaria transcriptions (.docx) into the project's tables.
 
-    index | location | speaker | audio | qom | español | revisión
+Each document lays one speaker's recordings out part by part. A part starts with the name
+of its audio file, followed by alternating Qom and Spanish lines:
 
-One row is one source segment and its Spanish translation, in source order, grouped by
-speaker and then by audio file. ``revisión`` carries the review notes for that row, in
-Spanish for the linguists. Rows with nothing to review have an empty ``revisión`` cell.
-
-The source documents lay the material out as alternating paragraphs:
-
-    <audio header>          e.g. "<Name> audio 1. 20:20" / "<Name Surname>, audio 5"
-    <qom paragraph>
-    <spanish paragraph>
-    <qom paragraph>
-    <spanish paragraph>
+    H-05_Name_01-02_040626_112853_Tr2.wav
+    <qom line>
+    <spanish line>
+    <qom line>
+    <spanish line>
     ...
+
+Two tables come out of one reading, both with a ``revisión`` column of notes for the
+linguists, in Spanish (empty when there is nothing to review):
+
+* ``corpus_ciudad_universitaria.csv``, one row per line pair, in the project's *formato
+  computacional* (``index, location, speaker, audio, qom, español, revisión``). This is
+  the table for training and for ``qomlaq duplicates --table``.
+* ``corpus_ciudad_universitaria_por_audio.csv``, one row per audio part, with the part's
+  Qom lines joined into one paragraph and its Spanish lines into another (``index,
+  location, speaker, audio, renglones, qom, español, revisión``). This is step 2 of the
+  team's curation process, the input for aligning text and audio.
 
 Nothing here corrects the Qom. Text is copied character for character (see STRIP_EDGES
 and NORMALIZE_NBSP for the only two whitespace settings). Anything ambiguous is reported
-in ``revisión`` for a linguist instead of being resolved silently.
-
-Apostrophes: the glottal stop in these documents is U+2019, and they also use U+2018 and
-U+00B4 in the same role. Those are not reported, since the project treats them as
-orthographic variation. Decoding failures (U+FFFD, mojibake) are.
+in ``revisión`` for a linguist instead of being resolved silently. Apostrophe variants
+(' ’ ‘ ´) are not reported, since the project treats them as orthographic variation.
+Decoding failures (U+FFFD, mojibake) are.
 
 The documents hold transcriptions from named speakers and are not published, so they stay
 in :func:`qomlaq.paths.speech_dir`, which git ignores. Each speaker's name is read from
@@ -67,10 +70,13 @@ STRIP_EDGES = True
 NORMALIZE_NBSP = False
 
 OUT_CORPUS = "corpus_ciudad_universitaria.csv"
-# The per-issue listing, written next to the corpus table.
+OUT_PER_AUDIO = "corpus_ciudad_universitaria_por_audio.csv"
+# The per-issue listing, written next to the tables.
 OUT_FLAGS = "revision_flags.csv"
 
 COLUMNS = ["index", "location", "speaker", "audio", "qom", "español", "revisión"]
+PER_AUDIO_COLUMNS = ["index", "location", "speaker", "audio", "renglones", "qom", "español",
+                     "revisión"]
 
 # Separator when a single row collects more than one review note.
 NOTE_SEP = " | "
@@ -123,35 +129,17 @@ def read_paragraphs(path):
 # Structural line recognition
 # --------------------------------------------------------------------------
 
-SPACE = r"[\s ]*"
-
-# "H-05_Name_01-02_040626_112853_Tr2.wav"
-WAV_RE = re.compile(r"H-\d\d_[A-Za-z]+_\d\d-\d\d_\d+_\d+_Tr\d(?:\.wav)?\s*$")
+# A part header is the audio file's name on a line of its own, with or without ".wav":
+# "H-05_Name_01-02_040626_112853_Tr2.wav", "M-03_Name_01-02_040626_143347_Tr1".
+AUDIO_FILE_RE = re.compile(r"([HM]-\d\d_[A-Za-z]+_\d\d-\d\d_\d+_\d+_Tr\d)(?:\.wav)?")
+FRONT_MATTER_RE = re.compile(r"^(Grabaciones\b|Ciudad Universitaria$|Transcripci[óo]n\b)", re.I)
 NUMERIC_ONLY_RE = re.compile(r"^\d+$")
 
 
-def _name_patterns(speakers: list[str]) -> list[str]:
-    """A speaker's first name, optionally followed by the rest of the name."""
-    patterns = []
-    for speaker in speakers:
-        first, *rest = speaker.split()
-        pattern = re.escape(first)
-        if rest:
-            pattern += "(?:%s%s)?" % (SPACE, SPACE.join(map(re.escape, rest)))
-        patterns.append(pattern)
-    return patterns
-
-
-def audio_header_re(speakers: list[str]) -> re.Pattern:
-    """"<Name> audio 1. 20:20" / "<Name Surname>, audio 5" / "<Name>\\xa0<Surname>,audio\\xa010"."""
-    return re.compile(r"^\s*(?:%s)%s,?%saudio%s(\d+)"
-                      % ("|".join(_name_patterns(speakers)), SPACE, SPACE, SPACE), re.I)
-
-
-def front_matter_re(speakers: list[str]) -> re.Pattern:
-    firsts = "|".join(re.escape(s.split()[0]) for s in speakers)
-    return re.compile(r"^(Grabaciones\b|Ciudad Universitaria$|Transcripci[óo]n\s+(?:%s))" % firsts,
-                      re.I)
+def audio_name(line: str) -> str | None:
+    """The audio file a header line names, always ending in ".wav"; None for other lines."""
+    m = AUDIO_FILE_RE.fullmatch(line)
+    return m.group(1) + ".wav" if m else None
 
 
 def clean(text):
@@ -167,6 +155,12 @@ def clean(text):
 # Language identification (used only to detect anomalies, never to edit text)
 # --------------------------------------------------------------------------
 
+
+def _fold(text):
+    """Lowercase, composed, with every apostrophe variant as '. For matching only."""
+    return re.sub(r"[’‘´`]", "'", unicodedata.normalize("NFC", text).lower())
+
+
 ES_WORDS = {
     "que", "de", "la", "el", "los", "las", "en", "un", "una", "y", "no", "para",
     "porque", "cuando", "entonces", "con", "se", "es", "está", "están", "muy",
@@ -175,24 +169,27 @@ ES_WORDS = {
     "fue", "nuestro", "nuestra", "había", "tienen", "tiene", "donde", "cada",
     "sólo", "solo", "les", "le", "si", "a", "o", "yo", "mi", "era", "ahí",
 }
-QOM_WORDS = {
-    "nache", "da", "na", "nam", "qom", "huo’o", "cha’aye", "so", "ca", "cam",
-    "ne’ena", "se’eso", "qataq", "taq’en", "ýaqto’", "ishet", "qalaxaye", "dam",
-    "ñi", "añi", "aso", "som", "qaq", "igo’", "ego’", "aja’", "qomi’", "de’eda",
-    "nagui", "na’a’q", "yi", "asa’aso", "eda", "ýataqta", "sa", "ten", "mashe",
-    "enac", "nataq’en", "qaica", "huotaique", "ýaýaten",
-}
-TOKEN_RE = re.compile(r"[0-9A-Za-zÀ-ÿýỹñ’'\-]+")
+# The documents write the nasal y as ỹ (earlier versions: ý); both count below.
+QOM_WORDS = {_fold(w) for w in (
+    "nache", "da", "na", "nam", "qom", "huo'o", "cha'aye", "so", "ca", "cam",
+    "ne'ena", "se'eso", "qataq", "taq'en", "ỹaqto'", "ishet", "qalaxaye", "dam",
+    "ñi", "añi", "aso", "som", "qaq", "igo'", "ego'", "aja'", "qomi'", "de'eda",
+    "nagui", "na'a'q", "yi", "asa'aso", "eda", "ỹataqta", "sa", "ten", "mashe",
+    "enac", "nataq'en", "qaica", "huotaique", "ỹaỹaten",
+)}
+QOM_ONLY_LETTERS = ("ỹ", "ý")
+TOKEN_RE = re.compile(r"[0-9a-zà-ÿýỹñ'\-]+")
 
 
 def classify(text):
     """Return ('qom'|'es'|None, margin). None means 'too close to call'."""
-    toks = TOKEN_RE.findall(text.lower())
+    folded = _fold(text)
+    toks = TOKEN_RE.findall(folded)
     if not toks:
         return None, 0
     es = sum(1 for w in toks if w in ES_WORDS)
     qm = sum(1 for w in toks if w in QOM_WORDS)
-    qm += 2 * text.count("ý")          # ý occurs only in the Qom tier
+    qm += 2 * sum(folded.count(c) for c in QOM_ONLY_LETTERS)   # only in the Qom tier
     if es == qm:
         return None, 0
     return ("es" if es > qm else "qom"), abs(es - qm)
@@ -212,44 +209,36 @@ def other(tier):
 # --------------------------------------------------------------------------
 
 
-def split_into_blocks(paragraphs, audio_re, front_re):
-    """Group paragraphs into audio blocks. Returns (blocks, structural_notes)."""
-    blocks, notes = [], []
-    current, wav = None, None
+def split_into_parts(paragraphs):
+    """Group paragraphs into audio parts. Returns (parts, structural_notes)."""
+    parts, notes = [], []
+    current = None
 
     for idx, raw in enumerate(paragraphs):
         probe = raw.replace(" ", " ").strip()
         if not probe:
             continue
-        if WAV_RE.search(probe):
-            wav = probe
-            continue
-        m = audio_re.match(probe)
-        if m:
-            current = {
-                "audio": "audio %d" % int(m.group(1)),
-                "header": probe,
-                "wav": wav,
-                "items": [],
-            }
-            blocks.append(current)
+        name = audio_name(probe)
+        if name:
+            current = {"audio": name, "items": []}
+            parts.append(current)
             continue
         if current is None:
-            if front_re.match(probe):
+            if FRONT_MATTER_RE.match(probe):
                 continue
-            notes.append((idx, probe, "texto suelto antes del primer encabezado de audio"))
+            notes.append((idx, probe, "texto suelto antes del primer nombre de archivo de audio"))
             continue
         if NUMERIC_ONLY_RE.match(probe):
             notes.append((idx, probe, "párrafo con un número suelto"))
             continue
         current["items"].append((idx, raw))
 
-    return blocks, notes
+    return parts, notes
 
 
-def pair_block(block, speaker, flags, next_index):
+def pair_part(part, speaker, flags, next_index):
     """
-    Pair a block's paragraphs into (qom, español) rows.
+    Pair a part's paragraphs into (qom, español) rows.
 
     Pairing follows the source's alternation. The language classifier is used only to
     spot where that alternation breaks:
@@ -262,8 +251,8 @@ def pair_block(block, speaker, flags, next_index):
         classifier as a genuine problem.
     """
     rows = []
-    items = block["items"]
-    audio = block["audio"]
+    items = part["items"]
+    audio = part["audio"]
     k, expect, held = 0, "qom", None
 
     def flag(row_index, issue):
@@ -350,13 +339,32 @@ def pair_block(block, speaker, flags, next_index):
     return rows
 
 
+def per_audio(df: pd.DataFrame) -> pd.DataFrame:
+    """One row per audio part: its Qom lines joined into one paragraph, and its Spanish.
+
+    Each part's review notes are its lines' notes, each prefixed with the line's index.
+    """
+    out = []
+    for audio, part in df.groupby("audio", sort=False):
+        notes = ["fila %s: %s" % (i, n) for i, n in zip(part["index"], part["revisión"]) if n]
+        out.append({
+            "index": len(out) + 1,
+            "location": part["location"].iloc[0],
+            "speaker": part["speaker"].iloc[0],
+            "audio": audio,
+            "renglones": len(part),
+            "qom": " ".join(t for t in part["qom"] if t),
+            "español": " ".join(t for t in part["español"] if t),
+            "revisión": NOTE_SEP.join(notes),
+        })
+    return pd.DataFrame(out, columns=PER_AUDIO_COLUMNS)
+
+
 # --------------------------------------------------------------------------
 # Character-level checks
 # --------------------------------------------------------------------------
 
-# Apostrophe / quotation-mark variants (U+2018, U+00B4, U+0027) are not reported: the
-# project treats them as orthographic variation, not defects. Only decoding failures are
-# reported here.
+# Only decoding failures are reported here.
 ODDITIES = {
     "�": "CARÁCTER DE REEMPLAZO (U+FFFD), indica un fallo de decodificación",
     "œ": "LIGADURA œ (U+0153), posible mojibake",
@@ -366,19 +374,18 @@ ODDITIES = {
 def extract(speech_dir: Path) -> None:
     source_dir = speech_dir / SOURCE_SUBDIR
     out_corpus = speech_dir / OUT_CORPUS
+    out_per_audio = speech_dir / OUT_PER_AUDIO
     out_flags = speech_dir / OUT_FLAGS
 
     documents = find_documents(source_dir)
-    speakers = [speaker for _, speaker in documents]
     speaker_notes = read_speaker_notes(source_dir)
-    audio_re, front_re = audio_header_re(speakers), front_matter_re(speakers)
 
-    all_rows, flags, summary_blocks = [], [], []
+    all_rows, flags, summary_parts = [], [], []
+    seen_audio = {}
     running = 1
 
     for path, speaker in documents:
-        paragraphs = read_paragraphs(path)
-        blocks, notes = split_into_blocks(paragraphs, audio_re, front_re)
+        parts, notes = split_into_parts(read_paragraphs(path))
 
         if speaker in speaker_notes:
             flags.append({
@@ -397,43 +404,34 @@ def extract(speech_dir: Path) -> None:
                          "segmento; confirmar que no es texto del corpus." % (kind, para_idx, text),
             })
 
-        seen_audio = {}
-        for block in blocks:
-            rows = pair_block(block, speaker, flags, running)
+        for part in parts:
+            rows = pair_part(part, speaker, flags, running)
 
-            # Duplicate "audio N" labels within one speaker (one document's numbering
-            # restarts partway through).
-            if block["audio"] in seen_audio:
+            if part["audio"] in seen_audio:
                 flags.append({
                     "row_index": running,
                     "speaker": speaker,
-                    "audio": block["audio"],
-                    "issue": "Etiqueta de audio duplicada: «%s» ya se había usado para la "
-                             "grabación «%s»; este bloque proviene de «%s» (encabezado «%s»). "
-                             "Las dos grabaciones quedan bajo la misma etiqueta, así que los "
-                             "conteos por audio las suman juntas. Hace falta decidir la "
-                             "numeración." % (
-                                 block["audio"], seen_audio[block["audio"]],
-                                 block["wav"], block["header"]),
+                    "audio": part["audio"],
+                    "issue": "Archivo de audio repetido: «%s» ya aparece en el documento de %s. "
+                             "Las dos partes quedan bajo el mismo nombre, así que la tabla por "
+                             "audio las junta en una sola fila."
+                             % (part["audio"], seen_audio[part["audio"]]),
                 })
             else:
-                seen_audio[block["audio"]] = block["wav"]
+                seen_audio[part["audio"]] = speaker
 
             for qom_text, es_text in rows:
                 all_rows.append({
                     "index": running,
                     "location": LOCATION,
                     "speaker": speaker,
-                    "audio": block["audio"],
+                    "audio": part["audio"],
                     "qom": qom_text,
                     "español": es_text,
                 })
                 running += 1
 
-            summary_blocks.append({
-                "speaker": speaker, "audio": block["audio"],
-                "wav": block["wav"] or "-", "rows": len(rows),
-            })
+            summary_parts.append({"speaker": speaker, "audio": part["audio"], "rows": len(rows)})
 
     df = pd.DataFrame(all_rows, columns=COLUMNS[:-1])
 
@@ -506,6 +504,7 @@ def extract(speech_dir: Path) -> None:
         lambda i: NOTE_SEP.join(notes_by_row.get(int(i), []))
     )
     df = df[COLUMNS]
+    by_audio = per_audio(df)
 
     flags_df = pd.DataFrame(flags, columns=["row_index", "speaker", "audio", "issue"])
     flags_df = flags_df.sort_values(
@@ -513,10 +512,12 @@ def extract(speech_dir: Path) -> None:
     ).reset_index(drop=True)
 
     df.to_csv(out_corpus, index=False, encoding="utf-8", quoting=csv.QUOTE_MINIMAL)
+    by_audio.to_csv(out_per_audio, index=False, encoding="utf-8", quoting=csv.QUOTE_MINIMAL)
     flags_df.to_csv(out_flags, index=False, encoding="utf-8", quoting=csv.QUOTE_MINIMAL)
 
-    report(df, flags_df, summary_blocks)
-    roundtrip_check(df, out_corpus)
+    report(df, by_audio, flags_df, summary_parts)
+    roundtrip_check(df, out_corpus, COLUMNS)
+    roundtrip_check(by_audio, out_per_audio, PER_AUDIO_COLUMNS)
 
 
 # --------------------------------------------------------------------------
@@ -524,22 +525,23 @@ def extract(speech_dir: Path) -> None:
 # --------------------------------------------------------------------------
 
 
-def report(df, flags_df, summary_blocks):
+def report(df, by_audio, flags_df, summary_parts):
     print("=" * 78)
     print("CIUDAD UNIVERSITARIA - parallel corpus summary")
     print("=" * 78)
-    print("Total segments (rows): %d" % len(df))
+    print("Line pairs (rows):  %d" % len(df))
+    print("Audio parts (rows): %d" % len(by_audio))
     print()
     print("Rows per speaker")
     print("-" * 78)
     for speaker, n in df.groupby("speaker", sort=False).size().items():
-        print("  %-16s %5d" % (speaker, n))
+        print("  %-18s %5d lines  %3d parts"
+              % (speaker, n, (by_audio["speaker"] == speaker).sum()))
     print()
-    print("Rows per audio file (in source order)")
+    print("Rows per audio part (in source order)")
     print("-" * 78)
-    print("  %-16s %-10s %6s   %s" % ("speaker", "audio", "rows", "source recording"))
-    for b in summary_blocks:
-        print("  %-16s %-10s %6d   %s" % (b["speaker"], b["audio"], b["rows"], b["wav"]))
+    for p in summary_parts:
+        print("  %-18s %-44s %4d" % (p["speaker"], p["audio"], p["rows"]))
     print()
     empty_q = int((df["qom"].str.strip() == "").sum())
     empty_e = int((df["español"].str.strip() == "").sum())
@@ -560,7 +562,7 @@ def report(df, flags_df, summary_blocks):
 
 
 _KINDS = [
-    ("Etiqueta de audio duplicada", "Etiqueta de audio duplicada"),
+    ("Archivo de audio repetido", "Archivo de audio repetido"),
     ("Posible segmento duplicado", "Posible segmento duplicado"),
     ("Segmento qom sin traducción", "Segmento qom sin traducción al español"),
     ("Segmento en español sin contraparte", "Segmento en español sin contraparte qom"),
@@ -568,6 +570,7 @@ _KINDS = [
     ("ESPACIO DURO", "Espacio duro U+00A0 (nota agregada por hablante)"),
     ("Confirmar la grafía", "Grafía del nombre del hablante"),
     ("número suelto", "Párrafo con un número suelto"),
+    ("texto suelto", "Texto suelto antes del primer archivo de audio"),
     ("Segmento qom duplicado", "Segmento qom duplicado"),
     ("Material entre corchetes", "Material entre corchetes o paréntesis"),
     ("Celda vacía", "Celda vacía"),
@@ -582,20 +585,20 @@ def _kind(issue):
     return "otro"
 
 
-def roundtrip_check(df, out_corpus: Path):
-    """Re-read the CSV from disk and prove the special characters survived."""
+def roundtrip_check(df, out_path: Path, columns: list[str]):
+    """Re-read a CSV from disk and prove the special characters survived."""
     print("=" * 78)
-    print("UTF-8 round-trip check")
+    print("UTF-8 round-trip check: %s" % out_path.name)
     print("=" * 78)
-    back = pd.read_csv(out_corpus, encoding="utf-8", keep_default_na=False, dtype=str)
+    back = pd.read_csv(out_path, encoding="utf-8", keep_default_na=False, dtype=str)
 
     # Source text only - this is what must survive character for character.
     written = "".join(df["qom"]) + "".join(df["español"])
     read = "".join(back["qom"]) + "".join(back["español"])
 
-    watch = ["’", "ý", "ñ", "ỹ", "í", "ó", "é",
+    watch = ["'", "’", "ý", "ñ", "ỹ", "í", "ó", "é",
              "á", "ú", "ü", "¿", "¡", "‘", "´",
-             " ", "Ý", "Ñ"]
+             " ", "Ý", "Ỹ", "Ñ"]
     print("  %-46s %8s %8s  %s" % ("character (in qom + español)", "written", "re-read", "ok"))
     ok = True
     for ch in watch:
@@ -610,7 +613,7 @@ def roundtrip_check(df, out_corpus: Path):
     same_shape = len(back) == len(df)
     identical = read == written
     rev_ok = "".join(back["revisión"]) == "".join(df["revisión"])
-    cols_ok = list(back.columns) == COLUMNS
+    cols_ok = list(back.columns) == columns
     print()
     print("  Column order preserved:      %s (%s)"
           % ("OK" if cols_ok else "MISMATCH", ", ".join(back.columns)))
@@ -618,7 +621,7 @@ def roundtrip_check(df, out_corpus: Path):
     print("  qom + español identical:     %s" % ("OK" if identical else "MISMATCH"))
     print("  revisión column identical:   %s" % ("OK" if rev_ok else "MISMATCH"))
     print("  Raw file decodes as UTF-8:   %s"
-          % ("OK" if _decodes_utf8(out_corpus) else "MISMATCH"))
+          % ("OK" if _decodes_utf8(out_path) else "MISMATCH"))
     print("  No U+FFFD after round trip:  %s" % ("OK" if "�" not in read else "MISMATCH"))
     print()
     print("  RESULT: %s"
