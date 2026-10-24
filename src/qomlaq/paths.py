@@ -44,6 +44,11 @@ def data_dir(explicit: str | Path | None = None) -> Path:
     return _located(explicit, "QOMLAQ_DATA_DIR", repo_root() / "corpus")
 
 
+def speech_dir(explicit: str | Path | None = None) -> Path:
+    """Directory holding the speech corpus sources. Not published: named speakers."""
+    return _located(explicit, "QOMLAQ_SPEECH_DIR", repo_root() / "corpus-speech")
+
+
 def experiments_dir(explicit: str | Path | None = None) -> Path:
     """Directory holding the experiment files."""
     return _located(explicit, "QOMLAQ_EXPERIMENTS_DIR", repo_root() / "experiments")

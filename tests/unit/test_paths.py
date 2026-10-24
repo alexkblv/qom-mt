@@ -46,7 +46,9 @@ def test_locations_can_be_moved_with_environment_variables(tmp_path, monkeypatch
     monkeypatch.setenv("QOMLAQ_ARTIFACTS_DIR", str(tmp_path / "a"))
     monkeypatch.setenv("QOMLAQ_DATA_DIR", str(tmp_path / "d"))
     monkeypatch.setenv("QOMLAQ_EXPERIMENTS_DIR", str(tmp_path / "e"))
+    monkeypatch.setenv("QOMLAQ_SPEECH_DIR", str(tmp_path / "s"))
     assert paths.artifacts_dir() == tmp_path / "a"
     assert paths.data_dir() == tmp_path / "d"
+    assert paths.speech_dir() == tmp_path / "s"
     assert paths.experiments_dir() == tmp_path / "e"
     assert paths.model_dir("x", "y") == tmp_path / "a" / "models" / "x" / "y"

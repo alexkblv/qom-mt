@@ -46,12 +46,13 @@ qomlaq evaluate baseline base__stratified__es2qom
 qomlaq evaluate baseline --evaluation domain-shift
 qomlaq report baseline           # tables under artifacts/tables/baseline/
 qomlaq duplicates baseline --table extra.csv   # exact and near-duplicates, before splitting
+python -m qomlaq.speech          # speech transcriptions (.docx) to a parallel table
 pytest                           # corpus-backed tests skip if corpus/ is absent
 ```
 
 Everything runs on any machine with the repository checked out. Training needs a GPU;
-nothing else does. `QOMLAQ_DATA_DIR`, `QOMLAQ_ARTIFACTS_DIR` and `QOMLAQ_EXPERIMENTS_DIR`
-move the inputs and outputs.
+nothing else does. `QOMLAQ_DATA_DIR`, `QOMLAQ_SPEECH_DIR`, `QOMLAQ_ARTIFACTS_DIR` and
+`QOMLAQ_EXPERIMENTS_DIR` move the inputs and outputs.
 
 The notebooks are thin front-ends to the same functions, one per stage:
 
@@ -141,6 +142,15 @@ coefficient from `textdistance` over bags of words. Nothing is removed: the matc
 an inspection floor go to `artifacts/duplicates/<corpus>/`, with the counts of pairs and
 rows at each candidate threshold (0.6 to 1.0) in `summary.json`, so a threshold can be
 chosen by reading the cases.
+
+**Speech transcriptions.** `python -m qomlaq.speech` reads the Ciudad Universitaria
+transcription documents (.docx, alternating Qom and Spanish paragraphs under each audio
+header) and writes them in the project's *formato computacional* (`index, location,
+speaker, audio, qom, español`), one row per segment, plus a `revisión` column of notes for
+the linguists. It copies the text as it is: missing translations, merged lines, lines that
+don't read as Qom and encoding problems are reported, never fixed. The documents name
+their speakers, so they and the table stay outside the repository (`QOMLAQ_SPEECH_DIR`,
+default `corpus-speech/`).
 
 ### Splits
 
